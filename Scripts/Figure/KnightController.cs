@@ -10,16 +10,7 @@
                 for (var j = LocationY - 2; j < LocationY + 3 && j > -1 && j < 8; j++)
                 {
                     if ((i - LocationX) * (j - LocationY) != 2 && (i - LocationX) * (j - LocationY) != -2) continue;
-                    
-                    if (gameController.GetFigureControllerAtPosition(i, j) == null)
-                    {
-                        gameController.HighlightCubeAvailableToMoveOnto(boardController.GetCube(i, j));
-                    }
-
-                    if (gameController.GetFigureControllerAtPosition(i, j).Color != Color)
-                    {
-                        gameController.HighlightCubeUnderFigureToCapture(boardController.GetCube(i, j));
-                    }
+                    HighlightCubes(i, j);
                 }
             }
         }

@@ -12,7 +12,6 @@ namespace Figure
 
         void Start()
         {
-            Debug.Log("zdarowa from " + gameObject.GetComponent<FigureController>().name);
             Color = LocationY > 2 ? Color.white : Color.black;
             boardController = Util.GetBoardController();
             gameController = Util.GetGameController();
@@ -47,6 +46,26 @@ namespace Figure
             LocationX = x;
             LocationY = y;
             SetMoved();
+        }
+
+        // returns 'true' when break is needed after the method execution 
+        public bool HighlightCubes(int locX, int locY)
+        {
+            var figureControllerAtPosition = gameController.GetFigureControllerAtPosition(locX, locY);
+            var cubeAtPosition = boardController.GetCube(locX, locY);
+
+            if (figureControllerAtPosition == null)
+            {
+                gameController.HighlightCubeAvailableToMoveOnto(cubeAtPosition);
+                return false;
+            }
+
+            if (figureControllerAtPosition.Color != Color)
+            {
+                gameController.HighlightCubeUnderFigureToCapture(cubeAtPosition);
+            }
+
+            return true;
         }
     }
 }

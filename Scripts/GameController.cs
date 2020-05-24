@@ -7,6 +7,8 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
+    //TODO: first turn meshCollider
+    //TODO: rook castling issue
     private List<GameObject> figures;
 
     private BoardController boardController;
@@ -81,7 +83,9 @@ public class GameController : MonoBehaviour
         
         if (controllerOfFigureAtPosition != null)
         {
-            Destroy(controllerOfFigureAtPosition.gameObject);
+            GameObject figureAtPosition = controllerOfFigureAtPosition.gameObject;
+            figures.Remove(figureAtPosition);
+            Destroy(figureAtPosition);
         }
 
         activeFigure.transform.Translate(destinationY - activeFigureController.LocationY, 0, destinationX - activeFigureController.LocationX);
@@ -100,10 +104,27 @@ public class GameController : MonoBehaviour
 
     public bool IsCastlingAvailable(GameObject rook)
     {
+        var rookController = rook.GetComponent<FigureController>();
         var king = figures.First(figure =>
             figure.layer != 8 && figure.GetComponent<FigureController>().Color ==
-            rook.GetComponent<FigureController>().Color);
-        return !king.GetComponent<FigureController>().IsMoved() && !rook.GetComponent<FigureController>().IsMoved();
+            rookController.Color);
+        var kingController = king.GetComponent<FigureController>();
+        
+        if (!king.GetComponent<FigureController>().IsMoved() && !rook.GetComponent<FigureController>().IsMoved())
+        {
+            for (int locX = Math.Min(rookController.LocationX, kingController.LocationX) + 1;
+                locX < Math.Max(rookController.LocationX, kingController.LocationX);
+                locX++)
+            {
+                if (boardController.GetCube(locX, rookController.LocationY) != null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        return false;
     }
 
     private void SetCoordinatesOfGameObject(ElementOnGrid objectToSet)

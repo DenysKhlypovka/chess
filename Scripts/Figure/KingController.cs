@@ -9,15 +9,7 @@
             {
                 for (var j = LocationY - 1; j < LocationY + 2 & j > -1 && j < 8; j++)
                 {
-                    if (gameController.GetFigureControllerAtPosition(i, j) == null)
-                    {
-                        gameController.HighlightCubeAvailableToMoveOnto(boardController.GetCube(i, j));
-                    }
-
-                    if (gameController.GetFigureControllerAtPosition(i, j).Color != Color)
-                    {
-                        gameController.HighlightCubeUnderFigureToCapture(boardController.GetCube(i, j));
-                    }
+                    HighlightCubes(i, j);
                 }
             }
         }
