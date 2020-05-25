@@ -1,41 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Figure;
 using JetBrains.Annotations;
 using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-    //TODO: first turn meshCollider
-    //TODO: rook castling issue
-    private List<GameObject> figures;
-
+    //TODO: God class :/
     private BoardController boardController;
+    private HighlightManager highlightManager;
+    private FiguresController figuresController;
 
     private Color turnColor = Color.white;
 
     void Start()
     {
         boardController = Util.GetBoardController();
-        figures = Util.GetFigures();
-
-        foreach (var cube in boardController.GetCubeControllers())
+        figuresController = new FiguresController();
+        figuresController.Init(this, new HighlightManager(this, boardController));
+        
+        foreach (var cell in boardController.GetCellControllers())
         {
-            SetCoordinatesOfGameObject(cube.GetComponent<CubeController>());
+            Util.SetCoordinatesOfGameObject(cell.GetComponent<CellController>());
         }
 
-        foreach (var piece in figures)
-        {
-            FigureController figureController = piece.GetComponent<FigureController>();
-            SetCoordinatesOfGameObject(figureController);
-        }
+        ChangeFiguresMeshColliderDependingOnTurn();
     }
 
-    public void NextTurn()
+    private void NextTurn()
     {
+        Reset();
         turnColor = turnColor == Color.white ? Color.black : Color.white;
-        foreach (var figure in figures)
+        ChangeFiguresMeshColliderDependingOnTurn();
+    }
+
+    private void ChangeFiguresMeshColliderDependingOnTurn()
+    {
+        foreach (var figure in figuresController.Figures)
         {
             if (turnColor != figure.GetComponent<FigureController>().Color)
             {
@@ -56,146 +56,57 @@ public class GameController : MonoBehaviour
     [CanBeNull]
     public FigureController GetFigureControllerAtPosition(int x, int y)
     {
-        return figures
-            .Select(figure => figure.GetComponent<FigureController>())
-            .FirstOrDefault(figureController => figureController.LocationX == x && figureController.LocationY == y);
+        return figuresController.GetFigureControllerAtPosition(x, y);
     }
 
     public void Reset()
     {
-        DeactivateFigures();
-        boardController.RedrawCubes();
+        figuresController.DeactivateFigures();
+        boardController.RedrawCells();
     }
 
-    private void DeactivateFigures()
+    public void TakeTurn(int destinationX, int destinationY)
     {
-        foreach (var figure in figures.Select(figure => figure.GetComponent<FigureController>()).Where(figureController => figureController.IsActive))
-        {
-            figure.IsActive = false;
-        }
-    }
+        var activeFigure = figuresController.Figures.First(figure => figure.GetComponent<FigureController>().IsActive);
 
-    public void Move(int destinationX, int destinationY)
-    {
-        GameObject activeFigure = figures.First(figure => figure.GetComponent<FigureController>().IsActive);
-        FigureController activeFigureController = activeFigure.GetComponent<FigureController>();;
-        FigureController controllerOfFigureAtPosition = GetFigureControllerAtPosition(destinationX, destinationY);
-        
-        if (controllerOfFigureAtPosition != null)
+        var optionalControllerOfRook = activeFigure.GetComponent<RookController>();
+        if (optionalControllerOfRook != null && CastlingUtil.GetCastlingX(optionalControllerOfRook) == destinationX &&
+            IsCastlingAvailable(optionalControllerOfRook))
         {
-            GameObject figureAtPosition = controllerOfFigureAtPosition.gameObject;
-            figures.Remove(figureAtPosition);
-            Destroy(figureAtPosition);
+            Move(figuresController.GetKingOfColor(optionalControllerOfRook.Color),
+                CastlingUtil.GetKingCastlingX(optionalControllerOfRook),
+                optionalControllerOfRook.LocationY);
         }
 
-        activeFigure.transform.Translate(destinationY - activeFigureController.LocationY, 0, destinationX - activeFigureController.LocationX);
+        var optionalControllerOfFigureAtPosition =
+            figuresController.GetFigureControllerAtPosition(destinationX, destinationY);
+        if (optionalControllerOfFigureAtPosition != null)
+        {
+            DestroyFigure(optionalControllerOfFigureAtPosition.gameObject);
+        }
 
-        activeFigureController.SetPos(destinationX, destinationY);
-        
-        Reset();
+        Move(activeFigure, destinationX, destinationY);
         NextTurn();
     }
 
-    public void Castling(GameObject rook)
+    private void DestroyFigure(GameObject figureToDestroy)
     {
-        
-        //Move(x, y);
+        figuresController.RemoveFigure(figureToDestroy.gameObject);
+        Destroy(figureToDestroy);
     }
 
-    public bool IsCastlingAvailable(GameObject rook)
+    private void Move(GameObject figure, int destinationX, int destinationY)
     {
-        var rookController = rook.GetComponent<FigureController>();
-        var king = figures.First(figure =>
-            figure.layer != 8 && figure.GetComponent<FigureController>().Color ==
-            rookController.Color);
-        var kingController = king.GetComponent<FigureController>();
-        
-        if (!king.GetComponent<FigureController>().IsMoved() && !rook.GetComponent<FigureController>().IsMoved())
-        {
-            for (int locX = Math.Min(rookController.LocationX, kingController.LocationX) + 1;
-                locX < Math.Max(rookController.LocationX, kingController.LocationX);
-                locX++)
-            {
-                if (boardController.GetCube(locX, rookController.LocationY) != null)
-                {
-                    return false;
-                }
-            }
+        var figureController = figure.GetComponent<FigureController>();
 
-            return true;
-        }
-        return false;
+        figure.transform.Translate(destinationY - figureController.LocationY, 0,
+            destinationX - figureController.LocationX);
+        figureController.Move(destinationX, destinationY);
     }
 
-    private void SetCoordinatesOfGameObject(ElementOnGrid objectToSet)
+    public bool IsCastlingAvailable(RookController rookController)
     {
-        var physicalPosition = objectToSet.transform.position;
-        objectToSet.LocationX = (int) Math.Round(physicalPosition.z);// * -1 + 7;
-        objectToSet.LocationY = (int) Math.Round(physicalPosition.x);
+        return CastlingUtil.IsCastlingAvailable(rookController.gameObject,
+            figuresController.GetKingOfColor(rookController.Color), figuresController);
     }
-
-    public void HighlightCubeAvailableToMoveOnto(GameObject cubeToChangeColor)
-    {
-        RendererController.ChangeColor(cubeToChangeColor, Color.yellow);
-        cubeToChangeColor.GetComponent<CubeController>().Activate();
-    }
-
-    public void HighlightCastlingCube(GameObject cubeToChangeColor)
-    {
-        RendererController.ChangeColor(cubeToChangeColor, Color.blue);
-    }
-
-    public void HighlightCubeUnderActiveFigure(GameObject cubeToChangeColor)
-    {
-        RendererController.ChangeColor(cubeToChangeColor, Color.green);
-    }
-
-    public void HighlightCubeUnderFigureToCapture(GameObject cubeToChangeColor)
-    {
-        RendererController.ChangeColor(cubeToChangeColor, Color.red);
-        cubeToChangeColor.GetComponent<CubeController>().Activate();
-    }
-
-    public void RedrawCube(CubeController cubeController)
-    {
-        RendererController.ChangeColor(cubeController.gameObject, cubeController.Color);
-    }
-
-
-//	void Check(){		
-//		int x, y;
-//		int multip;
-//
-//		if (!turn) {
-//			x = blackKing.GetComponent<pieceController> ().boardPositionX;
-//			y = blackKing.GetComponent<pieceController> ().boardPositionY;
-//			multip = 1;
-//		} else {
-//			x = whiteKing.GetComponent<pieceController> ().boardPositionX;
-//			y = whiteKing.GetComponent<pieceController> ().boardPositionY;
-//			multip = -1;
-//		}
-//
-//		if (figures [x - 1, y + 1 * multip] == multip)
-//		if (pieces [x - 1, y + 1 * multip].GetComponent<pawn> ())
-//			check = true;
-//
-//		if (figures [x - 1, y + 1 * multip] == multip)
-//		if (pieces [x - 1, y + 1 * multip].GetComponent<pawn> ())
-//			check = true;
-//	
-//
-//		for (int i = x - 2; i < x + 3; i++)
-//		for (int j = y - 2; j < y + 3; j++) {
-//				if ((i > -1) && (i < 8) && (j > -1) && (j < 8))
-//				if (((i - x) * (j - y) == 2) || ((i - x) * (j - y) == -2))
-//				if (pieces [i, j])
-//				if (pieces [i, j].GetComponent<knight> ())
-//					check = true;
-//			}
-//	}
-
-//	public bool CheckTest(){	
-//		return check;
-//	}
 }

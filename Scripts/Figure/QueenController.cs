@@ -1,12 +1,12 @@
 ﻿namespace Figure
 {
-    public class QueenController : BishopRookMoveset
+    public class QueenController : FigureWithCyclicMoveset
     {
         void OnMouseDown()
         {
-            base.OnMouseDown();
-            CheckAvailableRookMoves();
-            CheckAvailableBishopMoves();
+            Activate();
+            CheckHorizontalVerticalMoves();
+            CheckDiagonalMoves();
         }
     }
 }

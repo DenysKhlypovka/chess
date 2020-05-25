@@ -4,31 +4,34 @@ using UnityEngine;
 
 public class BoardController : MonoBehaviour
 {
-    private List<CubeController> cubeControllers;
-    protected GameController gameController;
+    private List<CellController> cellControllers;
 
     void Start()
     {
-        cubeControllers = Util.GetCubes().ConvertAll(o => o.GetComponent<CubeController>());
-        gameController = Util.GetGameController();
+        cellControllers = Util.GetCells().ConvertAll(o => o.GetComponent<CellController>());
     }
 
-    public List<CubeController> GetCubeControllers()
+    public List<CellController> GetCellControllers()
     {
-        return cubeControllers;
+        return cellControllers;
     }
 
-    public GameObject GetCube(int x, int y)
+    public GameObject GetCell(int x, int y)
     {
-        return cubeControllers.First(cube => cube.LocationX == x && cube.LocationY == y).gameObject;
+        return cellControllers.First(cell => cell.LocationX == x && cell.LocationY == y).gameObject;
     }
-    
-    public void RedrawCubes()
+
+    public void RedrawCells()
     {
-        foreach (var cubeController in Util.GetCubes().Select(cube => cube.GetComponent<CubeController>()))
+        foreach (var cellController in Util.GetCells().Select(cell => cell.GetComponent<CellController>()))
         {
-            cubeController.Dectivate();
-            gameController.RedrawCube(cubeController);
+            cellController.Deactivate();
+            RedrawCell(cellController);
         }
+    }
+
+    private void RedrawCell(CellController cellController)
+    {
+        RendererController.ChangeColor(cellController.gameObject, cellController.Color);
     }
 }

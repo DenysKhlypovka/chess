@@ -5,29 +5,24 @@ namespace Figure
     public class FigureController : ElementOnGrid
     {
         private bool moved;
-        private bool isActive;
 
-        protected BoardController boardController;
+        protected HighlightManager highlightManager;
         protected GameController gameController;
 
-        void Start()
+        public void Init(GameController gameController, HighlightManager highlightManager)
         {
             Color = LocationY > 2 ? Color.white : Color.black;
-            boardController = Util.GetBoardController();
-            gameController = Util.GetGameController();
+            this.highlightManager = highlightManager;
+            this.gameController = gameController;
         }
 
-        protected void OnMouseDown()
+        protected void Activate()
         {
             gameController.Reset();
+            
             if (Color != gameController.GetTurnColor()) return;
-            isActive = true;
-            gameController.HighlightCubeUnderActiveFigure(boardController.GetCube(LocationX, LocationY));
-        }
-
-        private void SetMoved()
-        {
-            moved = true;
+            IsActive = true;
+            highlightManager.HighlightCellUnderActiveFigure(LocationX, LocationY);
         }
 
         public bool IsMoved()
@@ -35,36 +30,24 @@ namespace Figure
             return moved;
         }
 
-        public bool IsActive
-        {
-            get => isActive;
-            set => isActive = value;
-        }
+        public bool IsActive { get; set; }
 
-        public void SetPos(int x, int y)
+        public void Move(int x, int y)
         {
             LocationX = x;
             LocationY = y;
-            SetMoved();
+            moved = true;
         }
 
-        // returns 'true' when break is needed after the method execution 
-        public bool HighlightCubes(int locX, int locY)
+        // returns 'true' cell is blocked by other figure 
+        protected bool HighlightCells(int locX, int locY)
         {
-            var figureControllerAtPosition = gameController.GetFigureControllerAtPosition(locX, locY);
-            var cubeAtPosition = boardController.GetCube(locX, locY);
-
-            if (figureControllerAtPosition == null)
+            if (highlightManager.CheckAndHighlightCellAvailableToMoveOnto(locX, locY))
             {
-                gameController.HighlightCubeAvailableToMoveOnto(cubeAtPosition);
                 return false;
             }
 
-            if (figureControllerAtPosition.Color != Color)
-            {
-                gameController.HighlightCubeUnderFigureToCapture(cubeAtPosition);
-            }
-
+            highlightManager.CheckAndHighlightCellUnderFigureToCapture(locX, locY, Color);
             return true;
         }
     }

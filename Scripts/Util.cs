@@ -1,23 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public class Util : MonoBehaviour
 {
-    public static List<GameObject> GetCubes()
+    public static List<GameObject> GetCells()
     {
-        return GetGameObjectsOfTag(Tag.cube);
+        return GetGameObjectsOfTag(Tag.cell);
     }
+
     public static List<GameObject> GetFigures()
     {
         return GetGameObjectsOfTag(Tag.figure);
     }
-    
+
     public static GameController GetGameController()
     {
         return GetGameObjectOfTag(Tag.controller).GetComponent<GameController>();
     }
-    
+
     public static BoardController GetBoardController()
     {
         return GetGameObjectOfTag(Tag.board).GetComponent<BoardController>();
@@ -29,9 +31,16 @@ public class Util : MonoBehaviour
             .OfType<GameObject>()
             .ToList();
     }
-    
+
     private static GameObject GetGameObjectOfTag(Tag tag)
     {
         return GameObject.FindWithTag(tag.ToString());
+    }
+
+    public static void SetCoordinatesOfGameObject(ElementOnGrid objectToSet)
+    {
+        var physicalPosition = objectToSet.transform.position;
+        objectToSet.LocationX = (int) Math.Round(physicalPosition.z); // * -1 + 7;
+        objectToSet.LocationY = (int) Math.Round(physicalPosition.x);
     }
 }

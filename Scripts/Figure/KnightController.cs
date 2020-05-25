@@ -1,18 +1,22 @@
-﻿namespace Figure
+﻿using System.Collections.Generic;
+
+namespace Figure
 {
-    public class KnightController : FigureController
+    public class KnightController : FigureWithDefinedMoveset
     {
-        void OnMouseDown()
+        private void Start()
         {
-            base.OnMouseDown();
-            for (var i = LocationX - 2; i < LocationX + 3 && i > -1 && i < 8; i++)
+            moveset = new List<MoveOffset>
             {
-                for (var j = LocationY - 2; j < LocationY + 3 && j > -1 && j < 8; j++)
-                {
-                    if ((i - LocationX) * (j - LocationY) != 2 && (i - LocationX) * (j - LocationY) != -2) continue;
-                    HighlightCubes(i, j);
-                }
-            }
+                new MoveOffset(-2, -1),
+                new MoveOffset(-2, 1),
+                new MoveOffset(-1, -2),
+                new MoveOffset(-1, 2),
+                new MoveOffset(1, -2),
+                new MoveOffset(1, 2),
+                new MoveOffset(2, -1),
+                new MoveOffset(2, 1)
+            };
         }
     }
 }

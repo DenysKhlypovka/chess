@@ -1,49 +1,47 @@
-﻿using UnityEngine;
-
-namespace Figure
+﻿namespace Figure
 {
-    public class BishopRookMoveset : FigureController
+    public abstract class FigureWithCyclicMoveset : FigureController
     {
-        public void CheckAvailableBishopMoves()
+        public void CheckDiagonalMoves()
         {
             for (int locX = LocationX + 1, locY = LocationY + 1; locX < 8 && locY < 8; locX++, locY++)
             {
-                if (HighlightCubes(locX, locY))
+                if (HighlightCells(locX, locY))
                 {
                     break;
                 }
             }
 
-            for (int locX = LocationX + 1, locY = LocationY - 1; locX < 8 && locY >= 0; locX++, locY--)
+            for (int locX = LocationX + 1, locY = LocationY - 1; locX < 8 && locY > -1; locX++, locY--)
             {
-                if (HighlightCubes(locX, locY))
+                if (HighlightCells(locX, locY))
                 {
                     break;
                 }
             }
 
-            for (int locX = LocationX - 1, locY = LocationY + 1; locX >= 0 && locY < 8; locX--, locY++)
+            for (int locX = LocationX - 1, locY = LocationY + 1; locX > -1 && locY < 8; locX--, locY++)
             {
-                if (HighlightCubes(locX, locY))
+                if (HighlightCells(locX, locY))
                 {
                     break;
                 }
             }
 
-            for (int locX = LocationX - 1, locY = LocationY - 1; locX >= 0 && locY >= 0; locX--, locY--)
+            for (int locX = LocationX - 1, locY = LocationY - 1; locX > -1 && locY > -1; locX--, locY--)
             {
-                if (HighlightCubes(locX, locY))
+                if (HighlightCells(locX, locY))
                 {
                     break;
                 }
             }
         }
 
-        public void CheckAvailableRookMoves()
+        public void CheckHorizontalVerticalMoves()
         {
             for (var i = LocationX + 1; i < 8; i++)
             {
-                if (HighlightCubes(i, LocationY))
+                if (HighlightCells(i, LocationY))
                 {
                     break;
                 }
@@ -51,7 +49,7 @@ namespace Figure
 
             for (var i = LocationX - 1; i > -1; i--)
             {
-                if (HighlightCubes(i, LocationY))
+                if (HighlightCells(i, LocationY))
                 {
                     break;
                 }
@@ -59,7 +57,7 @@ namespace Figure
 
             for (var j = LocationY + 1; j < 8; j++)
             {
-                if (HighlightCubes(LocationX, j))
+                if (HighlightCells(LocationX, j))
                 {
                     break;
                 }
@@ -67,7 +65,7 @@ namespace Figure
 
             for (var j = LocationY - 1; j > -1; j--)
             {
-                if (HighlightCubes(LocationX, j))
+                if (HighlightCells(LocationX, j))
                 {
                     break;
                 }

@@ -1,4 +1,4 @@
 ﻿public enum Tag
 {
-    figure, cube, controller, board
+    figure, cell, controller, board
 }

@@ -6,37 +6,16 @@ namespace Figure
     {
         void OnMouseDown()
         {
-            base.OnMouseDown();
-            var j = LocationY + 1 * GetColorMultiplier();
-            if (j > -1 && j < 8)
-                if (HighlightCubeAvailableToMoveOnto(j))
-                {
-                    if (!IsMoved())
-                    {
-                        HighlightCubeAvailableToMoveOnto(LocationY + 2 * GetColorMultiplier());
-                    }
-                }
+            Activate();
+            var locY = LocationY + 1 * GetColorMultiplier();
 
-            HighlightCubeUnderFigureToCapture(LocationX + 1, j);
-            HighlightCubeUnderFigureToCapture(LocationX - 1, j);
-        }
-
-        bool HighlightCubeAvailableToMoveOnto(int j)
-        {
-            if (gameController.GetFigureControllerAtPosition(LocationX, j) != null) return false;
-            gameController.HighlightCubeAvailableToMoveOnto(boardController.GetCube(LocationX, j));
-            return true;
-        }
-
-        void HighlightCubeUnderFigureToCapture(int i, int j)
-        {
-            if (i <= -1 || i >= 8 || j <= -1 || j >= 8) return;
-            var figureControllerAtPosition = gameController.GetFigureControllerAtPosition(i, j);
-            if (figureControllerAtPosition == null) return;
-            if (figureControllerAtPosition.Color != Color)
+            if (highlightManager.CheckAndHighlightCellAvailableToMoveOnto(LocationX, locY) && !IsMoved())
             {
-                gameController.HighlightCubeUnderFigureToCapture(boardController.GetCube(i, j));
+                highlightManager.CheckAndHighlightCellAvailableToMoveOnto(LocationX, LocationY + 2 * GetColorMultiplier());
             }
+            
+            highlightManager.CheckAndHighlightCellUnderFigureToCapture(LocationX - 1, locY, Color);
+            highlightManager.CheckAndHighlightCellUnderFigureToCapture(LocationX + 1, locY, Color);
         }
 
         private int GetColorMultiplier()

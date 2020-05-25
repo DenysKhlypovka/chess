@@ -1,7 +1,6 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
-public class CubeController : ElementOnGrid
+public class CellController : ElementOnGrid
 {
     private bool activated;
     private GameController gameController;
@@ -17,7 +16,7 @@ public class CubeController : ElementOnGrid
         activated = true;
     }
 
-    public void Dectivate()
+    public void Deactivate()
     {
         activated = false;
     }
@@ -26,7 +25,7 @@ public class CubeController : ElementOnGrid
     {
         if (activated)
         {
-            gameController.Move(LocationX, LocationY);
+            gameController.TakeTurn(LocationX, LocationY);
         }
     }
 }

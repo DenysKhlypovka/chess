@@ -1,11 +1,11 @@
 ﻿namespace Figure
 {
-    public class BishopController : BishopRookMoveset
+    public class BishopController : FigureWithCyclicMoveset
     {
         void OnMouseDown()
         {
-            base.OnMouseDown();
-            CheckAvailableBishopMoves();
+            Activate();
+            CheckDiagonalMoves();
         }
     }
 }

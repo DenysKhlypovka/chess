@@ -1,25 +1,20 @@
 ﻿namespace Figure
 {
-    public class RookController : BishopRookMoveset
+    public class RookController : FigureWithCyclicMoveset
     {
         void OnMouseDown()
         {
-            base.OnMouseDown();
-            CheckAvailableRookMoves();
+            Activate();
+            CheckHorizontalVerticalMoves();
             CheckCastling();
         }
 
         void CheckCastling()
         {
-            if (gameController.IsCastlingAvailable(gameObject))
+            if (gameController.IsCastlingAvailable(this))
             {
-                gameController.HighlightCastlingCube(boardController.GetCube(GetCastlingX(), LocationY));
+                highlightManager.HighlightCastlingCell(this);
             }
-        }
-        
-        int GetCastlingX()
-        {
-            return LocationX == 0 ? 3 : 5;
         }
     }
 }
