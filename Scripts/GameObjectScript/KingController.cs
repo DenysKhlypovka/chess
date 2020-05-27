@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Figure
+namespace GameObjectScript
 {
-    public class KingController : FigureWithDefinedMoveset
+    public class KingController : FigureController
     {
-        private void Start()
+        public override void FillMoveset()
         {
             moveset = new List<MoveOffset>
             {

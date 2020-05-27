@@ -1,15 +1,15 @@
-﻿namespace Figure
+﻿namespace GameObjectScript
 {
-    public class RookController : FigureWithCyclicMoveset
+    public class RookController : FigureController
     {
-        void OnMouseDown()
+        //TODO: fix, refactor castling
+        public override void FillMoveset()
         {
-            Activate();
             CheckHorizontalVerticalMoves();
             CheckCastling();
         }
 
-        void CheckCastling()
+        private void CheckCastling()
         {
             if (gameController.IsCastlingAvailable(this))
             {

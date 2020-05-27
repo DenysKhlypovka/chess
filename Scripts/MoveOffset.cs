@@ -1,14 +1,12 @@
 ﻿public class MoveOffset
 {
-    private int offsetX, offsetY;
-
     public MoveOffset(int offsetX, int offsetY)
     {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
+        OffsetX = offsetX;
+        OffsetY = offsetY;
     }
 
-    public int OffsetX => offsetX;
+    public int OffsetX { get; }
 
-    public int OffsetY => offsetY;
+    public int OffsetY { get; }
 }
