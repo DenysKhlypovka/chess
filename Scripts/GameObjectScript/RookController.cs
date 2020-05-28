@@ -1,8 +1,9 @@
-﻿namespace GameObjectScript
+﻿using Util;
+
+namespace GameObjectScript
 {
     public class RookController : FigureController
     {
-        //TODO: fix, refactor castling
         public override void FillMoveset()
         {
             CheckHorizontalVerticalMoves();
@@ -11,10 +12,13 @@
 
         private void CheckCastling()
         {
-            if (gameController.IsCastlingAvailable(this))
-            {
-                highlightManager.HighlightCastlingCell(this);
-            }
+            if (!gameController.IsCastlingAvailable(this)) return;
+
+            var castlingDestinationX = CastlingUtil.GetRookCastlingDestinationX(this);
+            var castlingDestinationOffsetX = castlingDestinationX - LocationX;
+            moveset.RemoveAll(moveset =>
+                moveset.OffsetX == castlingDestinationOffsetX && moveset.OffsetY == 0);
+            availableMoves.Add(new MoveProperties(castlingDestinationX, LocationY, null, MoveType.Castling));
         }
     }
 }

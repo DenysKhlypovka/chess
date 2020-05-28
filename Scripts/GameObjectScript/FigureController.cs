@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Controller;
 using UnityEngine;
 
@@ -7,7 +6,7 @@ namespace GameObjectScript
 {
     public abstract class FigureController : ElementOnGrid
     {
-        private List<MoveProperties> availableMoves;
+        protected List<MoveProperties> availableMoves;
         protected List<MoveOffset> moveset;
 
         private bool moved;
@@ -33,9 +32,10 @@ namespace GameObjectScript
             if (!gameController.IsAllowedToMove(this)) return;
             IsActive = true;
             highlightManager.HighlightCellUnderActiveFigure(LocationX, LocationY);
+            GetAvailableMoves().ForEach(availableMove => highlightManager.HighlightCell(availableMove.MoveType, availableMove.LocX, availableMove.LocY));
         }
 
-        public void ClearAvailableMovesList()
+        public virtual void ClearAvailableMovesList()
         {
             availableMoves.Clear();
         }
@@ -59,7 +59,7 @@ namespace GameObjectScript
             moved = true;
         }
 
-        private void CheckAvailableMoves()
+        protected virtual void CheckAvailableMoves()
         {
             moveset.ForEach(moveLocationOffset =>
             {
@@ -79,16 +79,15 @@ namespace GameObjectScript
                 return MoveProperties.GetUnavailableMoveProperties();
             }
 
-            var figureController = gameController.GetFigureControllerAtPosition(locX, locY);
-            var figurePosition = new MoveProperties(locX, locY);
-            if (figureController == null)
+            var controllerOfFigureAtPosition = gameController.GetFigureControllerAtPosition(locX, locY);
+            var figurePosition = new MoveProperties(locX, locY, controllerOfFigureAtPosition, MoveType.Capture);
+            if (controllerOfFigureAtPosition == null)
             {
                 figurePosition.MoveType = MoveType.Move;
                 return figurePosition;
             }
 
-            figurePosition.MoveType = MoveType.Capture;
-            return figureController.Color != Color
+            return controllerOfFigureAtPosition.Color != Color
                 ? figurePosition
                 : MoveProperties.GetUnavailableMoveProperties();
         }
@@ -174,24 +173,13 @@ namespace GameObjectScript
         void OnMouseDown()
         {
             Activate();
+        }
+
+        public List<MoveProperties> GetAvailableMoves()
+        {
             FillMoveset();
             CheckAvailableMoves();
-            availableMoves.ForEach(availableMove =>
-            {
-                switch (availableMove.MoveType)
-                {
-                    case MoveType.Move:
-                        highlightManager.HighlightCellAvailableToMoveOnto(availableMove.LocX, availableMove.LocY);
-                        break;
-                    case MoveType.Capture:
-                        highlightManager.HighlightCellUnderFigureToCapture(availableMove.LocX, availableMove.LocY);
-                        break;
-                    case MoveType.Unavailable:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            });
+            return availableMoves;
         }
 
         public abstract void FillMoveset();

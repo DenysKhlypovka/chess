@@ -1,5 +1,6 @@
-﻿using GameObjectScript;
-using Util;
+﻿using System;
+using GameObjectScript;
+using UnityEngine;
 
 namespace Controller
 {
@@ -13,31 +14,46 @@ namespace Controller
             this.boardController = boardController;
         }
 
+        public void HighlightCell(MoveType moveType, int locationX, int locationY)
+        {
+            var cellToChangeColor = boardController.GetCell(locationX, locationY);
+            switch (moveType)
+            {
+                case MoveType.Castling:
+                    HighlightCastlingCell(cellToChangeColor);
+                    break;
+                case MoveType.Move:
+                    HighlightCellAvailableToMoveOnto(cellToChangeColor);
+                    break;
+                case MoveType.Capture:
+                    HighlightCellUnderFigureToCapture(cellToChangeColor);
+                    break;
+                case MoveType.Unavailable:
+                    return;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            cellToChangeColor.GetComponent<CellController>().Activate();
+        }
+
         public void HighlightCellUnderActiveFigure(int locationX, int locationY)
         {
             RendererController.SetColorToYellow(boardController.GetCell(locationX, locationY));
         }
 
-        public void HighlightCastlingCell(RookController rookController)
+        private void HighlightCastlingCell(GameObject cellToChangeColor)
         {
-            var cellToChangeColor =
-                boardController.GetCell(CastlingUtil.GetRookCastlingDestinationX(rookController),
-                    rookController.LocationY);
             RendererController.SetColorToBlue(cellToChangeColor);
         }
 
-        public void HighlightCellAvailableToMoveOnto(int locationX, int locationY)
+        private void HighlightCellAvailableToMoveOnto(GameObject cellToChangeColor)
         {
-            var cellToChangeColor = boardController.GetCell(locationX, locationY);
             RendererController.SetColorToGreen(cellToChangeColor);
-            cellToChangeColor.GetComponent<CellController>().Activate();
         }
 
-        public void HighlightCellUnderFigureToCapture(int locationX, int locationY)
+        private void HighlightCellUnderFigureToCapture(GameObject cellToChangeColor)
         {
-            var cellToChangeColor = boardController.GetCell(locationX, locationY);
             RendererController.SetColorToRed(cellToChangeColor);
-            cellToChangeColor.GetComponent<CellController>().Activate();
         }
     }
 }

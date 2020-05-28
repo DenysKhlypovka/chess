@@ -8,12 +8,16 @@ namespace Controller
 {
     public class GameController : MonoBehaviour
     {
-        //TODO: God class :/
+        //TODO: Other figures to be able to capture a figure-source of check
+        //TODO: Check from pawns
+        //TODO: Improve check (moveset checking without king)
         private BoardController boardController;
         private HighlightManager highlightManager;
         private FiguresController figuresController;
 
         private Color turnColor = Color.white;
+
+        private bool kingInCheck;
 
         void Start()
         {
@@ -34,6 +38,33 @@ namespace Controller
             Reset();
             turnColor = turnColor == Color.white ? Color.black : Color.white;
             ChangeFiguresMeshColliderDependingOnTurn();
+            SetKingAvailableMoves();
+        }
+
+        private void SetKingAvailableMoves()
+        {
+            
+            kingInCheck = false;
+            var kingController = figuresController.GetKingOfColor(turnColor).GetComponent<KingController>();
+            var kingAvailableMoves = kingController.GetAvailableMoves();
+
+            foreach (var enemyFigure in figuresController.Figures
+                .Select(figure => figure.GetComponent<FigureController>())
+                .Where(figureController => figureController.Color != turnColor))
+            {
+                foreach (var enemyFigureAvailableMove in enemyFigure.GetAvailableMoves())
+                {
+                    if (enemyFigureAvailableMove.LocX == kingController.LocationX &&
+                        enemyFigureAvailableMove.LocY == kingController.LocationY)
+                    {
+                        kingInCheck = true;
+                    }
+                    if (kingAvailableMoves.Any(kingAvailableMove => kingAvailableMove.LocX == enemyFigureAvailableMove.LocX && kingAvailableMove.LocY == enemyFigureAvailableMove.LocY))
+                    {
+                        kingController.AddToUnavailableMoves(enemyFigureAvailableMove);
+                    }
+                }
+            }
         }
 
         private void ChangeFiguresMeshColliderDependingOnTurn()
@@ -58,7 +89,8 @@ namespace Controller
 
         public bool IsAllowedToMove(FigureController figureController)
         {
-            return figureController.Color == GetTurnColor();
+            return figureController.Color == GetTurnColor() &&
+                    (!kingInCheck || kingInCheck && figureController.GetComponent<KingController>() != null);
         }
 
         [CanBeNull]

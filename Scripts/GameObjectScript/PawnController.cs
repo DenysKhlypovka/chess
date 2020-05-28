@@ -10,7 +10,7 @@ namespace GameObjectScript
             var firstCellForwardY = LocationY + firstCellForwardOffsetY;
 
             var firstMoveCell = GetMoveProperties(LocationX, firstCellForwardY);
-            if (firstMoveCell.MoveType == MoveType.Move && !IsMoved())
+            if (firstMoveCell.MoveType == MoveType.Move)
             {
                 moveset.Add(new MoveOffset(0, firstCellForwardOffsetY));
                 var secondCellForwardOffsetY = 2 * GetColorMultiplier();

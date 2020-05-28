@@ -2,5 +2,6 @@
 {
     Capture,
     Move,
+    Castling,
     Unavailable
 }

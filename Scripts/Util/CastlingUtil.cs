@@ -14,7 +14,7 @@ namespace Util
 
         public static int GetKingCastlingDestinationX(ElementOnGrid rookController)
         {
-            return rookController.LocationX == 0 ? 1 : 6;
+            return rookController.LocationX == 0 ? 2 : 6;
         }
 
         public static bool IsCastlingAvailable(GameObject rook, GameObject king, FiguresController figuresController)
