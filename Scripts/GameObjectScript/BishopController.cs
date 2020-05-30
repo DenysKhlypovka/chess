@@ -1,10 +1,12 @@
-﻿namespace GameObjectScript
+﻿using System.Collections.Generic;
+
+namespace GameObjectScript
 {
     public class BishopController : FigureController
     {
-        public override void FillMoveset()
+        public override List<MoveProperties> GetPossibleMoveset()
         {
-            CheckDiagonalMoves();
+            return CheckDiagonalMoves();
         }
     }
 }

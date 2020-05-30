@@ -44,13 +44,20 @@ namespace Util
         public static void SetCoordinatesOfGameObject(ElementOnGrid objectToSet)
         {
             var physicalPosition = objectToSet.transform.position;
-            objectToSet.LocationX = (int) Math.Round(physicalPosition.z); // * -1 + 7;
-            objectToSet.LocationY = (int) Math.Round(physicalPosition.x);
+            objectToSet.Coordinate = new Coordinate((int) Math.Round(physicalPosition.z),
+                (int) Math.Round(physicalPosition.x));
         }
 
-        public static bool CellOutOfBounds(int locX, int locY)
+        public static bool IsCellOutOfBounds(Coordinate coordinate)
         {
-            return locX < 0 || locX > 7 || locY < 0 || locY > 7;
+            return coordinate.X < 0 || coordinate.X > 7 || coordinate.Y < 0 || coordinate.Y > 7;
+        }
+
+        public static void MovePhysically(GameObject figure, Coordinate destinationCoordinate)
+        {
+            var figureController = figure.GetComponent<FigureController>();
+            figure.transform.Translate(destinationCoordinate.Y - figureController.Coordinate.Y, 0,
+                destinationCoordinate.X - figureController.Coordinate.X);
         }
     }
 }

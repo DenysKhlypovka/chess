@@ -2,6 +2,7 @@
 {
     Capture,
     Move,
+    PotentialCapture,
     Castling,
     Unavailable
 }

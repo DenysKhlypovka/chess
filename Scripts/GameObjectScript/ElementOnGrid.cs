@@ -1,13 +1,13 @@
-﻿using UnityEngine;
+﻿using Controller;
+using UnityEngine;
 
 namespace GameObjectScript
 {
     public class ElementOnGrid : MonoBehaviour
     {
-        public int LocationX { get; set; }
-
-        public int LocationY { get; set; }
-
+        protected GameController gameController;
+        public Coordinate Coordinate { get; set; }
         public Color Color { get; set; }
+        public bool IsActivated { get; set; }
     }
 }

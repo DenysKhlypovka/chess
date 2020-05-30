@@ -14,9 +14,9 @@ namespace Controller
             this.boardController = boardController;
         }
 
-        public void HighlightCell(MoveType moveType, int locationX, int locationY)
+        public void HighlightCell(MoveType moveType, Coordinate coordinate)
         {
-            var cellToChangeColor = boardController.GetCell(locationX, locationY);
+            var cellToChangeColor = boardController.GetCell(coordinate);
             switch (moveType)
             {
                 case MoveType.Castling:
@@ -30,15 +30,15 @@ namespace Controller
                     break;
                 case MoveType.Unavailable:
                     return;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                case MoveType.PotentialCapture:
+                    return;
             }
-            cellToChangeColor.GetComponent<CellController>().Activate();
+            cellToChangeColor.GetComponent<CellController>().IsActivated = true;
         }
 
-        public void HighlightCellUnderActiveFigure(int locationX, int locationY)
+        public void HighlightCellUnderActiveFigure(Coordinate coordinate)
         {
-            RendererController.SetColorToYellow(boardController.GetCell(locationX, locationY));
+            RendererController.SetColorToYellow(boardController.GetCell(coordinate));
         }
 
         private void HighlightCastlingCell(GameObject cellToChangeColor)

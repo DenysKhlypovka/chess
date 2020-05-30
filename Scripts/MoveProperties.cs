@@ -1,22 +1,31 @@
-﻿using GameObjectScript;
+﻿using System.Collections.Generic;
 
 public class MoveProperties
 {
-    public int LocX { get; }
-    public int LocY { get; }
-    public FigureController ControllerOfFigureAtPosition { get; }
+    public Coordinate Coordinate { get; }
     public MoveType MoveType { get; set; }
 
-    public MoveProperties(int locX, int locY, FigureController controllerOfFigureAtPosition, MoveType moveType)
+    public MoveProperties(Coordinate coordinate, MoveType moveType)
     {
-        LocX = locX;
-        LocY = locY;
-        ControllerOfFigureAtPosition = controllerOfFigureAtPosition;
+        Coordinate = coordinate;
         MoveType = moveType;
+    }
+    
+    public MoveProperties(Coordinate coordinate)
+    {
+        Coordinate = coordinate;
     }
 
     public static MoveProperties GetUnavailableMoveProperties()
     {
-        return new MoveProperties(0, 0, null, MoveType.Unavailable);
+        return new MoveProperties(new Coordinate(0, 0), MoveType.Unavailable);
+    }
+
+    public static void AddToMoveset(List<MoveProperties> moveset, MoveProperties move)
+    {
+        if (move.MoveType != MoveType.Unavailable)
+        {
+            moveset.Add(move);
+        }
     }
 }

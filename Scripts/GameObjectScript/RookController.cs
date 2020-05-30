@@ -1,24 +1,28 @@
-﻿using Util;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Util;
 
 namespace GameObjectScript
 {
     public class RookController : FigureController
     {
-        public override void FillMoveset()
+        public override List<MoveProperties> GetPossibleMoveset()
         {
-            CheckHorizontalVerticalMoves();
-            CheckCastling();
+            var moveset = CheckHorizontalVerticalMoves();
+            CheckCastling(moveset);
+            return moveset;
         }
 
-        private void CheckCastling()
+        private void CheckCastling(List<MoveProperties> moveset)
         {
             if (!gameController.IsCastlingAvailable(this)) return;
 
-            var castlingDestinationX = CastlingUtil.GetRookCastlingDestinationX(this);
-            var castlingDestinationOffsetX = castlingDestinationX - LocationX;
-            moveset.RemoveAll(moveset =>
-                moveset.OffsetX == castlingDestinationOffsetX && moveset.OffsetY == 0);
-            availableMoves.Add(new MoveProperties(castlingDestinationX, LocationY, null, MoveType.Castling));
+            var castlingMove = moveset.FirstOrDefault(moveToChange =>
+                moveToChange.Coordinate.Equals(new Coordinate(CastlingUtil.GetRookCastlingDestinationX(this), Coordinate.Y)));
+            if (castlingMove != null)
+            {
+                castlingMove.MoveType = MoveType.Castling;
+            }
         }
     }
 }

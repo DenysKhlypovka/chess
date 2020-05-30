@@ -9,12 +9,12 @@ namespace Util
     {
         public static int GetRookCastlingDestinationX(ElementOnGrid rookController)
         {
-            return rookController.LocationX == 0 ? 3 : 5;
+            return rookController.Coordinate.X == 0 ? 3 : 5;
         }
 
         public static int GetKingCastlingDestinationX(ElementOnGrid rookController)
         {
-            return rookController.LocationX == 0 ? 2 : 6;
+            return rookController.Coordinate.X == 0 ? 2 : 6;
         }
 
         public static bool IsCastlingAvailable(GameObject rook, GameObject king, FiguresController figuresController)
@@ -25,11 +25,11 @@ namespace Util
             if (king.GetComponent<FigureController>().IsMoved() ||
                 rook.GetComponent<FigureController>().IsMoved()) return false;
 
-            for (var locX = Math.Min(rookController.LocationX, kingController.LocationX) + 1;
-                locX < Math.Max(rookController.LocationX, kingController.LocationX);
-                locX++)
+            for (var coordinate = new Coordinate(Math.Min(rookController.Coordinate.X, kingController.Coordinate.X) + 1, rookController.Coordinate.Y);
+                coordinate.X < Math.Max(rookController.Coordinate.X, kingController.Coordinate.X);
+                coordinate.X++)
             {
-                if (figuresController.GetFigureControllerAtPosition(locX, rookController.LocationY) != null)
+                if (figuresController.GetFigureControllerAtPosition(coordinate) != null)
                 {
                     return false;
                 }

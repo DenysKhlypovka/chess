@@ -12,23 +12,22 @@ namespace Controller
         void Start()
         {
             cellControllers = Util.Util.GetCells().ConvertAll(o => o.GetComponent<CellController>());
+            foreach (var cell in cellControllers)
+            {
+                Util.Util.SetCoordinatesOfGameObject(cell.GetComponent<CellController>());
+            }
         }
 
-        public List<CellController> GetCellControllers()
+        public GameObject GetCell(Coordinate coordinate)
         {
-            return cellControllers;
-        }
-
-        public GameObject GetCell(int x, int y)
-        {
-            return cellControllers.First(cell => cell.LocationX == x && cell.LocationY == y).gameObject;
+            return cellControllers.First(cell => cell.Coordinate.Equals(coordinate)).gameObject;
         }
 
         public void RedrawCells()
         {
             foreach (var cellController in Util.Util.GetCells().Select(cell => cell.GetComponent<CellController>()))
             {
-                cellController.Deactivate();
+                cellController.IsActivated = false;
                 RedrawCell(cellController);
             }
         }

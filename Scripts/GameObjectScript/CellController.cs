@@ -1,34 +1,24 @@
-﻿using Controller;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace GameObjectScript
 {
     public class CellController : ElementOnGrid
     {
-        private bool activated;
-        private GameController gameController;
-
         void Start()
         {
-            Color = (LocationX + LocationY) % 2 == 0 ? Color.white : Color.black;
+            Color = (Coordinate.X + Coordinate.Y) % 2 == 0 ? Color.white : Color.black;
             gameController = Util.Util.GetGameController();
-        }
-
-        public void Activate()
-        {
-            activated = true;
-        }
-
-        public void Deactivate()
-        {
-            activated = false;
         }
 
         void OnMouseDown()
         {
-            if (activated)
+            if (IsActivated)
             {
-                gameController.TakeTurn(LocationX, LocationY);
+                gameController.TakeTurn(Coordinate);
+            }
+            else
+            {
+                gameController.TryActivateFigure(Coordinate);
             }
         }
     }

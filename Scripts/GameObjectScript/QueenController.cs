@@ -1,11 +1,13 @@
-﻿namespace GameObjectScript
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace GameObjectScript
 {
     public class QueenController : FigureController
     {
-        public override void FillMoveset()
+        public override List<MoveProperties> GetPossibleMoveset()
         {
-            CheckHorizontalVerticalMoves();
-            CheckDiagonalMoves();
+            return CheckHorizontalVerticalMoves().Concat(CheckDiagonalMoves()).ToList();
         }
     }
 }

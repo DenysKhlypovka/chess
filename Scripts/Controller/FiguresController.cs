@@ -8,29 +8,26 @@ namespace Controller
 {
     public class FiguresController
     {
-        public FiguresController()
+        public FiguresController(GameController gameController)
         {
             Figures = Util.Util.GetFigures();
-        }
-
-        public void Init(GameController gameController, HighlightManager highlightManager)
-        {
             foreach (var figureController in Figures.Select(piece =>
                 piece.GetComponent<FigureController>()))
             {
                 Util.Util.SetCoordinatesOfGameObject(figureController);
-                figureController.Init(gameController, highlightManager);
+                SetColorOfFigure(figureController);
+                figureController.Init(gameController);
             }
         }
 
         internal List<GameObject> Figures { get; }
 
         [CanBeNull]
-        public FigureController GetFigureControllerAtPosition(int x, int y)
+        public FigureController GetFigureControllerAtPosition(Coordinate coordinate)
         {
             return Figures
                 .Select(figure => figure.GetComponent<FigureController>())
-                .FirstOrDefault(figureController => figureController.LocationX == x && figureController.LocationY == y);
+                .FirstOrDefault(figureController => figureController.Coordinate.Equals(coordinate));
         }
 
         public void RemoveFigure(GameObject figureToRemove)
@@ -48,12 +45,16 @@ namespace Controller
         public void DeactivateFigures()
         {
             foreach (var figure in Figures.Select(figure => figure.GetComponent<FigureController>())
-                .Where(figureController => figureController.IsActive))
+                .Where(figureController => figureController.IsActivated))
             {
-                figure.IsActive = false;
-                figure.ClearAvailableMovesList();
-                figure.ClearMoveset();
+                figure.IsActivated = false;
             }
+        }
+
+        private void SetColorOfFigure(FigureController figureController)
+        {
+            //TODO: magic number 2
+            figureController.Color = figureController.Coordinate.Y > 2 ? Color.white : Color.black;
         }
     }
 }

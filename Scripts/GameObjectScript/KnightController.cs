@@ -4,19 +4,19 @@ namespace GameObjectScript
 {
     public class KnightController : FigureController
     {
-        public override void FillMoveset()
+        public override List<MoveProperties> GetPossibleMoveset()
         {
-            moveset = new List<MoveOffset>
+            return FilterInitialMoveset(new List<MoveProperties>
             {
-                new MoveOffset(-2, -1),
-                new MoveOffset(-2, 1),
-                new MoveOffset(-1, -2),
-                new MoveOffset(-1, 2),
-                new MoveOffset(1, -2),
-                new MoveOffset(1, 2),
-                new MoveOffset(2, -1),
-                new MoveOffset(2, 1)
-            };
+                new MoveProperties(new Coordinate(Coordinate.X - 2, Coordinate.Y - 1)),
+                new MoveProperties(new Coordinate(Coordinate.X - 2, Coordinate.Y + 1)),
+                new MoveProperties(new Coordinate(Coordinate.X - 1, Coordinate.Y - 2)),
+                new MoveProperties(new Coordinate(Coordinate.X - 1, Coordinate.Y + 2)),
+                new MoveProperties(new Coordinate(Coordinate.X + 1, Coordinate.Y - 2)),
+                new MoveProperties(new Coordinate(Coordinate.X + 1, Coordinate.Y + 2)),
+                new MoveProperties(new Coordinate(Coordinate.X + 2, Coordinate.Y - 1)),
+                new MoveProperties(new Coordinate(Coordinate.X + 2, Coordinate.Y + 1))
+            });
         }
     }
 }
