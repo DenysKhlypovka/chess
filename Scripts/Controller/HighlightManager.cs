@@ -1,5 +1,6 @@
 ﻿using System;
 using GameObjectScript;
+using Model;
 using UnityEngine;
 
 namespace Controller

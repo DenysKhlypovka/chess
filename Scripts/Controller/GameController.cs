@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameObjectScript;
+using GameObjectScript.Figure;
+using Model;
 using UnityEngine;
 using Util;
 
@@ -8,7 +10,6 @@ namespace Controller
 {
     public class GameController : MonoBehaviour
     {
-        //TODO: Other figures to be able to capture a figure-source of check
         private BoardController boardController;
         private HighlightManager highlightManager;
         private FiguresController figuresController;

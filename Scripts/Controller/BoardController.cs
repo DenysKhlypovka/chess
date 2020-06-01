@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameObjectScript;
+using Model;
 using UnityEngine;
 
 namespace Controller

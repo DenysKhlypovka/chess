@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Controller;
 using GameObjectScript;
+using Model;
 using UnityEngine;
 
 namespace Util

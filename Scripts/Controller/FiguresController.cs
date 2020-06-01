@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameObjectScript;
+using GameObjectScript.Figure;
 using JetBrains.Annotations;
+using Model;
 using UnityEngine;
 
 namespace Controller

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Model;
 
-namespace GameObjectScript
+namespace GameObjectScript.Figure
 {
     public class QueenController : FigureController
     {

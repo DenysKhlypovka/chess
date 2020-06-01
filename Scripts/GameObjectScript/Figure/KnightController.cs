@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Model;
 
-namespace GameObjectScript
+namespace GameObjectScript.Figure
 {
     public class KnightController : FigureController
     {

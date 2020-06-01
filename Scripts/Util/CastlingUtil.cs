@@ -1,6 +1,7 @@
 ﻿using System;
 using Controller;
 using GameObjectScript;
+using Model;
 using UnityEngine;
 
 namespace Util
