@@ -3,6 +3,7 @@ using System.Linq;
 using GameObjectScript;
 using Model;
 using UnityEngine;
+using Util;
 
 namespace Controller
 {
@@ -12,7 +13,7 @@ namespace Controller
 
         void Start()
         {
-            cellControllers = Util.Util.GetCells().ConvertAll(o => o.GetComponent<CellController>());
+            cellControllers = ComponentsUtil.GetCells().ConvertAll(o => o.GetComponent<CellController>());
             foreach (var cell in cellControllers)
             {
                 Util.Util.SetCoordinatesOfGameObject(cell.GetComponent<CellController>());
@@ -26,7 +27,7 @@ namespace Controller
 
         public void RedrawCells()
         {
-            foreach (var cellController in Util.Util.GetCells().Select(cell => cell.GetComponent<CellController>()))
+            foreach (var cellController in ComponentsUtil.GetCells().Select(cell => cell.GetComponent<CellController>()))
             {
                 cellController.IsActivated = false;
                 RedrawCell(cellController);

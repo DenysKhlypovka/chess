@@ -21,7 +21,7 @@ namespace GameObjectScript.Figure
 
         private MoveType AddMoveToMoveset(List<MoveProperties> moveset, int coordinateYMultiplier)
         {
-            var cellDestinationY = Coordinate.Y + GetColorMultiplier() * coordinateYMultiplier;
+            var cellDestinationY = Coordinate.Y + GetFacingDirectionOffset() * coordinateYMultiplier;
             var moveProperties =
                 gameController.GetMoveProperties(new Coordinate(Coordinate.X, cellDestinationY), Color);
 
@@ -37,10 +37,10 @@ namespace GameObjectScript.Figure
         {
             MoveProperties.AddToMoveset(moveset,
                 gameController.GetMoveProperties(
-                    new Coordinate(Coordinate.X + offsetX, Coordinate.Y + GetColorMultiplier()), Color, true));
+                    new Coordinate(Coordinate.X + offsetX, Coordinate.Y + GetFacingDirectionOffset()), Color, true));
         }
 
-        private int GetColorMultiplier()
+        private int GetFacingDirectionOffset()
         {
             return Color == Color.black ? 1 : -1;
         }

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Util;
 
 namespace GameObjectScript
 {
@@ -7,7 +8,7 @@ namespace GameObjectScript
         void Start()
         {
             Color = (Coordinate.X + Coordinate.Y) % 2 == 0 ? Color.white : Color.black;
-            gameController = Util.Util.GetGameController();
+            gameController = ComponentsUtil.GetGameController();
         }
 
         void OnMouseDown()

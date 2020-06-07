@@ -20,7 +20,7 @@ namespace Model
 
         public static MoveProperties GetUnavailableMoveProperties()
         {
-            return new MoveProperties(new Coordinate(0, 0), MoveType.Unavailable);
+            return new MoveProperties(new Coordinate(-1, -1), MoveType.Unavailable);
         }
 
         public static void AddToMoveset(List<MoveProperties> moveset, MoveProperties move)
@@ -29,6 +29,11 @@ namespace Model
             {
                 moveset.Add(move);
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Coordinate.X)}: {Coordinate.X}, {nameof(Coordinate.Y)}: {Coordinate.Y}, {nameof(MoveType)}: {MoveType}";
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Controller;
 using Model;
 using Util;
@@ -33,13 +34,18 @@ namespace GameObjectScript
         {
             availableMoves = new List<MoveProperties>(moveset);
         }
+        
+        public bool NoAvailableMoves()
+        {
+            return availableMoves.Count == 0;
+        }
 
         public bool IsMoved()
         {
             return moved;
         }
 
-        public void ChangeCoordinates(Coordinate coordinate)
+        public void Move(Coordinate coordinate)
         {
             Coordinate = coordinate;
             moved = true;
@@ -48,7 +54,7 @@ namespace GameObjectScript
         protected List<MoveProperties> FilterInitialMoveset(List<MoveProperties> inputMoveset)
         {
             return inputMoveset.ConvertAll(moveProperties =>
-                gameController.GetMoveProperties(moveProperties.Coordinate, Color));
+                gameController.GetMoveProperties(moveProperties.Coordinate, Color)).Where(properties => properties.MoveType != MoveType.Unavailable).ToList();
         }
 
         public void Activate()

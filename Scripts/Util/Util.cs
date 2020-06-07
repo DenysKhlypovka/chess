@@ -10,36 +10,9 @@ namespace Util
 {
     public class Util : MonoBehaviour
     {
-        public static List<GameObject> GetCells()
+        public static Color GetOppositeColor(Color color)
         {
-            return GetGameObjectsOfTag(Tag.cell);
-        }
-
-        public static List<GameObject> GetFigures()
-        {
-            return GetGameObjectsOfTag(Tag.figure);
-        }
-
-        public static GameController GetGameController()
-        {
-            return GetGameObjectOfTag(Tag.controller).GetComponent<GameController>();
-        }
-
-        public static BoardController GetBoardController()
-        {
-            return GetGameObjectOfTag(Tag.board).GetComponent<BoardController>();
-        }
-
-        private static List<GameObject> GetGameObjectsOfTag(Tag tag)
-        {
-            return GameObject.FindGameObjectsWithTag(tag.ToString())
-                .OfType<GameObject>()
-                .ToList();
-        }
-
-        private static GameObject GetGameObjectOfTag(Tag tag)
-        {
-            return GameObject.FindWithTag(tag.ToString());
+            return color == Color.white ? Color.black : Color.white;
         }
 
         public static void SetCoordinatesOfGameObject(ElementOnGrid objectToSet)

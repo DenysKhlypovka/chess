@@ -13,23 +13,18 @@ namespace Controller
         private BoardController boardController;
         private HighlightManager highlightManager;
         private FiguresController figuresController;
+        private LayoutTextManager layoutTextManager;
 
         private Color turnColor = Color.white;
 
-        private bool kingInCheck;
-
         void Start()
         {
-            boardController = Util.Util.GetBoardController();
+            boardController = ComponentsUtil.GetBoardController();
             figuresController = new FiguresController(this);
             highlightManager = new HighlightManager(boardController);
+            layoutTextManager = new LayoutTextManager();
             ChangeFiguresMeshColliderDependingOnTurn();
             SetFiguresAvailableMoves();
-        }
-
-        private Color GetTurnColor()
-        {
-            return turnColor;
         }
 
         public void ResetBoardAndFigures()
@@ -40,11 +35,7 @@ namespace Controller
 
         public void TryActivateFigure(Coordinate coordinate)
         {
-            var optionalFigureController = figuresController.GetFigureControllerAtPosition(coordinate);
-            if (optionalFigureController != null)
-            {
-                optionalFigureController.Activate();
-            }
+            figuresController.TryActivateFigure(coordinate);
         }
 
         private void ChangeFiguresMeshColliderDependingOnTurn()
@@ -56,8 +47,7 @@ namespace Controller
 
         public bool IsAllowedToMove(FigureController figureController)
         {
-            return figureController.Color == GetTurnColor() &&
-                   (!kingInCheck || kingInCheck && figureController.GetComponent<KingController>() != null);
+            return figureController.Color == turnColor;
         }
 
         public void HighlightCells(List<MoveProperties> availableMoves, Coordinate coordinate)
@@ -67,48 +57,91 @@ namespace Controller
                 highlightManager.HighlightCell(availableMove.MoveType, availableMove.Coordinate));
         }
 
+        private void DestroyFigure(GameObject figureToDestroy)
+        {
+            figuresController.RemoveFigure(figureToDestroy);
+            Destroy(figureToDestroy);
+        }
+
+        private void Move(GameObject figure, Coordinate coordinate)
+        {
+            Util.Util.MovePhysically(figure, coordinate);
+            figure.GetComponent<FigureController>().Move(coordinate);
+        }
+
+        public bool CanMoveOnto(Coordinate coordinate)
+        {
+            return !Util.Util.IsCellOutOfBounds(coordinate) &&
+                   figuresController.GetFigureControllerAtPosition(coordinate) == null;
+        }
+
+        public bool IsCastlingAvailable(RookController rookController)
+        {
+            return CastlingUtil.IsCastlingAvailable(rookController.gameObject,
+                figuresController.GetKingOfColor(rookController.Color), figuresController);
+        }
+
+
         private void NextTurn()
         {
             ResetBoardAndFigures();
-            turnColor = turnColor == Color.white ? Color.black : Color.white;
+            turnColor = Util.Util.GetOppositeColor(turnColor);
             ChangeFiguresMeshColliderDependingOnTurn();
             SetFiguresAvailableMoves();
-            //SetKingAvailableMoves();
+            if (figuresController.GetFigureControllersOfColor(turnColor)
+                .All(figureController => figureController.NoAvailableMoves()))
+            {
+                layoutTextManager.DisplayCheckMateText(turnColor);
+            }
+            else if (VerifyCheck())
+            {
+                layoutTextManager.DisplayCheckText(turnColor);
+            }
+            else
+            {
+                layoutTextManager.DisplayNothing();
+            }
         }
 
         private void SetFiguresAvailableMoves()
         {
-            figuresController.Figures.ForEach(figure =>
+            foreach (var figureController in figuresController.GetFigureControllersOfColor(turnColor))
             {
-                var figureController = figure.GetComponent<FigureController>();
-                figureController.SetAvailableMoves(figureController.GetPossibleMoveset());
-            });
+                var availableMoves = new List<MoveProperties>();
+                figureController.GetPossibleMoveset().ForEach(possibleMove =>
+                {
+                    var enemyFigureAtCoordinate =
+                        figuresController.GetFigureControllerAtPosition(possibleMove.Coordinate);
+                    var formerCoordinate = figureController.Coordinate;
+                    figureController.Coordinate = possibleMove.Coordinate;
+
+                    if (!VerifyCheckIgnoringFigure(enemyFigureAtCoordinate))
+                    {
+                        availableMoves.Add(possibleMove);
+                    }
+
+                    figureController.Coordinate = formerCoordinate;
+                });
+                figureController.SetAvailableMoves(availableMoves);
+            }
         }
 
-        private void SetKingAvailableMoves()
+        private bool VerifyCheckIgnoringFigure(FigureController figureToIgnore)
         {
-            kingInCheck = false;
+            figuresController.RemoveFigure(figureToIgnore);
+            var isCheck = VerifyCheck();
+            figuresController.AddFigure(figureToIgnore);
+            return isCheck;
+        }
+
+        private bool VerifyCheck()
+        {
             var kingController = figuresController.GetKingOfColor(turnColor).GetComponent<KingController>();
-            var kingAvailableMoves = kingController.GetPossibleMoveset();
 
-            foreach (var enemyFigure in figuresController.Figures
-                .Select(figure => figure.GetComponent<FigureController>())
-                .Where(figureController => figureController.Color != turnColor))
-            {
-                foreach (var enemyFigureAvailableMove in enemyFigure.GetPossibleMoveset())
-                {
-                    if (enemyFigureAvailableMove.Coordinate.Equals(kingController.Coordinate))
-                    {
-                        kingInCheck = true;
-                    }
-
-                    if (kingAvailableMoves.Any(kingAvailableMove =>
-                        kingAvailableMove.Coordinate.Equals(enemyFigureAvailableMove.Coordinate)))
-                    {
-                        //kingController.AddToUnavailableMoves(enemyFigureAvailableMove);
-                    }
-                }
-            }
+            return figuresController
+                .GetFigureControllersOfColor(Util.Util.GetOppositeColor(turnColor)).Any(enemyFigure => enemyFigure
+                    .GetPossibleMoveset().Any(enemyFigureAvailableMove =>
+                        enemyFigureAvailableMove.Coordinate.Equals(kingController.Coordinate)));
         }
 
         public void TakeTurn(Coordinate coordinate)
@@ -142,18 +175,6 @@ namespace Controller
             }
         }
 
-        private void DestroyFigure(GameObject figureToDestroy)
-        {
-            figuresController.RemoveFigure(figureToDestroy.gameObject);
-            Destroy(figureToDestroy);
-        }
-
-        private void Move(GameObject figure, Coordinate coordinate)
-        {
-            Util.Util.MovePhysically(figure, coordinate);
-            figure.GetComponent<FigureController>().ChangeCoordinates(coordinate);
-        }
-
         public MoveProperties GetMoveProperties(Coordinate coordinate, Color color, bool isPotentialCapture = false)
         {
             if (Util.Util.IsCellOutOfBounds(coordinate))
@@ -171,18 +192,6 @@ namespace Controller
 
             moveProperties.MoveType = isPotentialCapture ? MoveType.PotentialCapture : MoveType.Move;
             return moveProperties;
-        }
-
-        public bool CanMoveOnto(Coordinate coordinate)
-        {
-            return !Util.Util.IsCellOutOfBounds(coordinate) &&
-                   figuresController.GetFigureControllerAtPosition(coordinate) == null;
-        }
-
-        public bool IsCastlingAvailable(RookController rookController)
-        {
-            return CastlingUtil.IsCastlingAvailable(rookController.gameObject,
-                figuresController.GetKingOfColor(rookController.Color), figuresController);
         }
     }
 }

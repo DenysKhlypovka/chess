@@ -5,6 +5,7 @@ using GameObjectScript.Figure;
 using JetBrains.Annotations;
 using Model;
 using UnityEngine;
+using Util;
 
 namespace Controller
 {
@@ -12,7 +13,7 @@ namespace Controller
     {
         public FiguresController(GameController gameController)
         {
-            Figures = Util.Util.GetFigures();
+            Figures = ComponentsUtil.GetFigures();
             foreach (var figureController in Figures.Select(piece =>
                 piece.GetComponent<FigureController>()))
             {
@@ -34,7 +35,26 @@ namespace Controller
 
         public void RemoveFigure(GameObject figureToRemove)
         {
-            Figures.Remove(figureToRemove);
+            if (figureToRemove != null)
+            {
+                Figures.Remove(figureToRemove);
+            }
+        }
+
+        public void RemoveFigure(FigureController figureScriptToRemove)
+        {
+            if (figureScriptToRemove != null)
+            {
+                Figures.Remove(figureScriptToRemove.gameObject);
+            }
+        }
+
+        public void AddFigure(FigureController figureScriptToAdd)
+        {
+            if (figureScriptToAdd != null)
+            {
+                Figures.Add(figureScriptToAdd.gameObject);
+            }
         }
 
         public GameObject GetKingOfColor(Color color)
@@ -42,6 +62,20 @@ namespace Controller
             return Figures.First(figure =>
                 figure.GetComponent<KingController>() != null &&
                 figure.GetComponent<FigureController>().Color == color);
+        }
+        
+        public IEnumerable<FigureController> GetFigureControllersOfColor(Color color)
+        {
+            return Figures.ConvertAll(figure => figure.GetComponent<FigureController>()).Where(figureController => figureController.Color == color);
+        }
+        
+        public void TryActivateFigure(Coordinate coordinate)
+        {
+            var optionalFigureController = GetFigureControllerAtPosition(coordinate);
+            if (optionalFigureController != null)
+            {
+                optionalFigureController.Activate();
+            }
         }
 
         public void DeactivateFigures()
