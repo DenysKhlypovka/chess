@@ -27,11 +27,10 @@ namespace Util
             return coordinate.X < 0 || coordinate.X > 7 || coordinate.Y < 0 || coordinate.Y > 7;
         }
 
-        public static void MovePhysically(GameObject figure, Coordinate destinationCoordinate)
+        public static void MovePhysically(PieceController pieceController, Coordinate destinationCoordinate)
         {
-            var figureController = figure.GetComponent<FigureController>();
-            figure.transform.Translate(destinationCoordinate.Y - figureController.Coordinate.Y, 0,
-                destinationCoordinate.X - figureController.Coordinate.X);
+            pieceController.gameObject.transform.Translate(destinationCoordinate.Y - pieceController.Coordinate.Y, 0,
+                destinationCoordinate.X - pieceController.Coordinate.X);
         }
     }
 }

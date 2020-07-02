@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using Model;
 
-namespace GameObjectScript.Figure
+namespace GameObjectScript.Piece
 {
-    public class KingController : FigureController
+    public class KingController : PieceController
     {
+        void Awake()
+        {
+            piece = Model.Piece.King;
+        }
         public override List<MoveProperties> GetPossibleMoveset()
         {
             return FilterInitialMoveset(new List<MoveProperties>

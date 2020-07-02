@@ -1,10 +1,15 @@
 ﻿using System.Collections.Generic;
 using Model;
 
-namespace GameObjectScript.Figure
+namespace GameObjectScript.Piece
 {
-    public class BishopController : FigureController
+    public class BishopController : PieceController
     {
+        void Awake()
+        {
+            piece = Model.Piece.Bishop;
+        }
+
         public override List<MoveProperties> GetPossibleMoveset()
         {
             return CheckDiagonalMoves();

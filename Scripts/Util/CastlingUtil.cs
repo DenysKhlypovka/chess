@@ -18,19 +18,15 @@ namespace Util
             return rookController.Coordinate.X == 0 ? 2 : 6;
         }
 
-        public static bool IsCastlingAvailable(GameObject rook, GameObject king, FiguresController figuresController)
+        public static bool IsCastlingAvailable(PieceController rook, PieceController king, PiecesController piecesController)
         {
-            var rookController = rook.GetComponent<FigureController>();
-            var kingController = king.GetComponent<FigureController>();
+            if (king.IsMoved() || rook.IsMoved()) return false;
 
-            if (king.GetComponent<FigureController>().IsMoved() ||
-                rook.GetComponent<FigureController>().IsMoved()) return false;
-
-            for (var coordinate = new Coordinate(Math.Min(rookController.Coordinate.X, kingController.Coordinate.X) + 1, rookController.Coordinate.Y);
-                coordinate.X < Math.Max(rookController.Coordinate.X, kingController.Coordinate.X);
+            for (var coordinate = new Coordinate(Math.Min(rook.Coordinate.X, king.Coordinate.X) + 1, rook.Coordinate.Y);
+                coordinate.X < Math.Max(rook.Coordinate.X, king.Coordinate.X);
                 coordinate.X++)
             {
-                if (figuresController.GetFigureControllerAtPosition(coordinate) != null)
+                if (piecesController.GetPieceControllerAtPosition(coordinate) != null)
                 {
                     return false;
                 }

@@ -2,10 +2,14 @@
 using System.Linq;
 using Model;
 
-namespace GameObjectScript.Figure
+namespace GameObjectScript.Piece
 {
-    public class QueenController : FigureController
+    public class QueenController : PieceController
     {
+        void Awake()
+        {
+            piece = Model.Piece.Queen;
+        }
         public override List<MoveProperties> GetPossibleMoveset()
         {
             return CheckHorizontalVerticalMoves().Concat(CheckDiagonalMoves()).ToList();

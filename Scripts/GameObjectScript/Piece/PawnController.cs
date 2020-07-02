@@ -2,10 +2,14 @@
 using Model;
 using UnityEngine;
 
-namespace GameObjectScript.Figure
+namespace GameObjectScript.Piece
 {
-    public class PawnController : FigureController
+    public class PawnController : PieceController
     {
+        void Awake()
+        {
+            piece = Model.Piece.Pawn;
+        }
         public override List<MoveProperties> GetPossibleMoveset()
         {
             var moveset = new List<MoveProperties>();

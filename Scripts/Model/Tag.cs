@@ -2,7 +2,7 @@
 {
     public enum Tag
     {
-        figure,
+        piece,
         cell,
         controller,
         board,

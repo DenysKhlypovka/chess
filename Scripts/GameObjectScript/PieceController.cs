@@ -2,14 +2,16 @@
 using System.Linq;
 using Controller;
 using Model;
+using UnityEngine;
 using Util;
 
 namespace GameObjectScript
 {
-    public abstract class FigureController : ElementOnGrid
+    public abstract class PieceController : ElementOnGrid
     {
         private List<MoveProperties> availableMoves;
 
+        internal Model.Piece piece;
         private bool moved;
 
         public void Init(GameController gameController)
@@ -60,7 +62,7 @@ namespace GameObjectScript
         public void Activate()
         {
             if (IsActivated) return;
-            gameController.ResetBoardAndFigures();
+            gameController.ResetBoardAndPieces();
 
             if (!gameController.IsAllowedToMove(this)) return;
             IsActivated = true;
@@ -69,12 +71,12 @@ namespace GameObjectScript
 
         protected List<MoveProperties> CheckDiagonalMoves()
         {
-            return CheckCyclicMoves(FigureMovesetParameters.GetDiagonalMovesetParametersList(Coordinate));
+            return CheckCyclicMoves(PieceMovesetParameters.GetDiagonalMovesetParametersList(Coordinate));
         }
 
         protected List<MoveProperties> CheckHorizontalVerticalMoves()
         {
-            return CheckCyclicMoves(FigureMovesetParameters.GetHorizontalVerticalMovesetParametersList(Coordinate));
+            return CheckCyclicMoves(PieceMovesetParameters.GetHorizontalVerticalMovesetParametersList(Coordinate));
         }
 
         private List<MoveProperties> CheckCyclicMoves(List<MovesetParameters> movesetParametersList)

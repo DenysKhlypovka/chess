@@ -3,7 +3,7 @@ using Model;
 
 namespace Util
 {
-    public static class FigureMovesetParameters
+    public static class PieceMovesetParameters
     {
         public static List<MovesetParameters> GetDiagonalMovesetParametersList(Coordinate coordinate)
         {

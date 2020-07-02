@@ -3,10 +3,14 @@ using System.Linq;
 using Model;
 using Util;
 
-namespace GameObjectScript.Figure
+namespace GameObjectScript.Piece
 {
-    public class RookController : FigureController
+    public class RookController : PieceController
     {
+        void Awake()
+        {
+            piece = Model.Piece.Rook;
+        }
         public override List<MoveProperties> GetPossibleMoveset()
         {
             var moveset = CheckHorizontalVerticalMoves();

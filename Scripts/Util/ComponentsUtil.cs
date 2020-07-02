@@ -14,9 +14,9 @@ namespace Util
             return GetGameObjectsOfTag(Tag.cell);
         }
 
-        public static List<GameObject> GetFigures()
+        public static List<GameObject> GetPieces()
         {
-            return GetGameObjectsOfTag(Tag.figure);
+            return GetGameObjectsOfTag(Tag.piece);
         }
 
         public static GameController GetGameController()

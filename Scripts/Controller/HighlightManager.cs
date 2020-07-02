@@ -27,7 +27,7 @@ namespace Controller
                     HighlightCellAvailableToMoveOnto(cellToChangeColor);
                     break;
                 case MoveType.Capture:
-                    HighlightCellUnderFigureToCapture(cellToChangeColor);
+                    HighlightCellUnderPieceToCapture(cellToChangeColor);
                     break;
                 case MoveType.Unavailable:
                     return;
@@ -37,7 +37,7 @@ namespace Controller
             cellToChangeColor.GetComponent<CellController>().IsActivated = true;
         }
 
-        public void HighlightCellUnderActiveFigure(Coordinate coordinate)
+        public void HighlightCellUnderActivePiece(Coordinate coordinate)
         {
             RendererController.SetColorToYellow(boardController.GetCell(coordinate));
         }
@@ -52,7 +52,7 @@ namespace Controller
             RendererController.SetColorToGreen(cellToChangeColor);
         }
 
-        private void HighlightCellUnderFigureToCapture(GameObject cellToChangeColor)
+        private void HighlightCellUnderPieceToCapture(GameObject cellToChangeColor)
         {
             RendererController.SetColorToRed(cellToChangeColor);
         }

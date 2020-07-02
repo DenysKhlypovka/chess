@@ -19,7 +19,7 @@ namespace GameObjectScript
             }
             else
             {
-                gameController.TryActivateFigure(Coordinate);
+                gameController.TryActivatePiece(Coordinate);
             }
         }
     }

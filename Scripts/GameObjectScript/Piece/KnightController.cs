@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using Model;
 
-namespace GameObjectScript.Figure
+namespace GameObjectScript.Piece
 {
-    public class KnightController : FigureController
+    public class KnightController : PieceController
     {
+        void Awake()
+        {
+            piece = Model.Piece.Knight;
+        }
         public override List<MoveProperties> GetPossibleMoveset()
         {
             return FilterInitialMoveset(new List<MoveProperties>
