@@ -15,6 +15,11 @@ namespace Util
             return color == Color.white ? Color.black : Color.white;
         }
 
+        public static int GetFacingDirectionOffset(Color color)
+        {
+            return color == Color.black ? 1 : -1;
+        }
+
         public static void SetCoordinatesOfGameObject(ElementOnGrid objectToSet)
         {
             var physicalPosition = objectToSet.transform.position;

@@ -8,7 +8,7 @@ namespace GameObjectScript.Piece
     {
         void Awake()
         {
-            piece = Model.Piece.Queen;
+            PieceType = Model.Piece.Queen;
         }
         public override List<MoveProperties> GetPossibleMoveset()
         {

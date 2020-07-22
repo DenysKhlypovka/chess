@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Model;
-using UnityEngine;
 
 namespace GameObjectScript.Piece
 {
@@ -8,7 +7,7 @@ namespace GameObjectScript.Piece
     {
         void Awake()
         {
-            piece = Model.Piece.Pawn;
+            PieceType = Model.Piece.Pawn;
         }
         public override List<MoveProperties> GetPossibleMoveset()
         {
@@ -25,7 +24,7 @@ namespace GameObjectScript.Piece
 
         private MoveType AddMoveToMoveset(List<MoveProperties> moveset, int coordinateYMultiplier)
         {
-            var cellDestinationY = Coordinate.Y + GetFacingDirectionOffset() * coordinateYMultiplier;
+            var cellDestinationY = Coordinate.Y + Util.Util.GetFacingDirectionOffset(Color) * coordinateYMultiplier;
             var moveProperties =
                 gameController.GetMoveProperties(new Coordinate(Coordinate.X, cellDestinationY), Color);
 
@@ -41,12 +40,7 @@ namespace GameObjectScript.Piece
         {
             MoveProperties.AddToMoveset(moveset,
                 gameController.GetMoveProperties(
-                    new Coordinate(Coordinate.X + offsetX, Coordinate.Y + GetFacingDirectionOffset()), Color, true));
-        }
-
-        private int GetFacingDirectionOffset()
-        {
-            return Color == Color.black ? 1 : -1;
+                    new Coordinate(Coordinate.X + offsetX, Coordinate.Y + Util.Util.GetFacingDirectionOffset(Color)), Color, true));
         }
     }
 }

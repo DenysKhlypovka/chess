@@ -9,12 +9,12 @@ namespace Controller
 {
     public class BoardController : MonoBehaviour
     {
-        private List<CellController> cellControllers;
+        internal List<CellController> CellControllers { get; set; }
 
         void Start()
         {
-            cellControllers = ComponentsUtil.GetCells().ConvertAll(o => o.GetComponent<CellController>());
-            foreach (var cell in cellControllers)
+            CellControllers = ComponentsUtil.GetCells().ConvertAll(o => o.GetComponent<CellController>());
+            foreach (var cell in CellControllers)
             {
                 Util.Util.SetCoordinatesOfGameObject(cell.GetComponent<CellController>());
             }
@@ -22,7 +22,7 @@ namespace Controller
 
         public GameObject GetCell(Coordinate coordinate)
         {
-            return cellControllers.First(cell => cell.Coordinate.Equals(coordinate)).gameObject;
+            return CellControllers.First(cell => cell.Coordinate.Equals(coordinate)).gameObject;
         }
 
         public void RedrawCells()

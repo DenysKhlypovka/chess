@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using GameObjectScript;
-using GameObjectScript.Piece;
 using JetBrains.Annotations;
 using Model;
 using UnityEngine;
@@ -48,7 +47,7 @@ namespace Controller
         public PieceController GetKingOfColor(Color color)
         {
             return Pieces.First(pieceController =>
-                pieceController.piece == Piece.King &&
+                pieceController.PieceType == Piece.King &&
                 pieceController.Color == color);
         }
         
