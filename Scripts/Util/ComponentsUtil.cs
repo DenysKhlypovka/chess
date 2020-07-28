@@ -29,6 +29,16 @@ namespace Util
             return GetGameObjectOfTag(Tag.board).GetComponent<BoardController>();
         }
 
+        public static CameraController GetCameraController()
+        {
+            return Object.FindObjectOfType<CameraController>();
+        }
+
+        public static ButtonsController GetButtonsController()
+        {
+            return Object.FindObjectOfType<ButtonsController>();
+        }
+
         public static Text GetLayoutText()
         {
             return GetGameObjectOfTag(Tag.layout).GetComponent<Text>();

@@ -10,7 +10,9 @@ namespace Controller
 {
   public class GameController : MonoBehaviour
   {
+    private CameraController cameraController;
     private BoardController boardController;
+    private ButtonsController buttonsController;
     private HighlightManager highlightManager;
     private PiecesController piecesController;
     private CapturePromotionController capturePromotionController;
@@ -27,13 +29,20 @@ namespace Controller
 
     void Start()
     {
+      cameraController = ComponentsUtil.GetCameraController();
       boardController = ComponentsUtil.GetBoardController();
+      buttonsController = ComponentsUtil.GetButtonsController();
       piecesController = new PiecesController(this);
       highlightManager = new HighlightManager(boardController);
       layoutTextManager = new LayoutTextManager();
       capturePromotionController = new CapturePromotionController();
+      
       ChangePiecesMeshColliderDependingOnTurn();
       SetPiecesAvailableMoves();
+
+      buttonsController.Init();
+      buttonsController.StartGameButton.onClick.AddListener(delegate { FixateUnblurCamera(); });
+      buttonsController.ExitGameButton.onClick.AddListener(delegate { Application.Quit(); });
     }
 
     public void ResetBoardAndPieces()
@@ -73,6 +82,10 @@ namespace Controller
 
     public void HighlightCells(List<MoveProperties> availableMoves, Coordinate coordinate)
     {
+      if (cameraController.zoomType == CameraController.ZoomType.ZoomOut)
+      {
+        FixateUnblurCamera();
+      }
       highlightManager.HighlightCellUnderActivePiece(coordinate);
       availableMoves.ForEach(availableMove =>
         highlightManager.HighlightCell(availableMove.MoveType, availableMove.Coordinate));
@@ -243,6 +256,27 @@ namespace Controller
 
       moveProperties.MoveType = isPotentialCapture ? MoveType.PotentialCapture : MoveType.Move;
       return moveProperties;
+    }
+
+
+
+    private void FixateUnblurCamera()
+    {
+      buttonsController.ToggleFadeOutButtons();
+      cameraController.ToggleFixateCamera();
+      PostProcessingController.DisablePostProcessLayer(cameraController.gameObject);
+    }
+
+    private void ZoomOutBlurCamera()
+    {
+      cameraController.ToggleZoom(CameraController.ZoomType.ZoomOut);
+      PostProcessingController.EnablePostProcessLayer(cameraController.gameObject);
+    }
+    
+    private void ZoomInUnblurCamera()
+    {
+      cameraController.ToggleZoom(CameraController.ZoomType.ZoomIn);
+      PostProcessingController.DisablePostProcessLayer(cameraController.gameObject);
     }
   }
 }
