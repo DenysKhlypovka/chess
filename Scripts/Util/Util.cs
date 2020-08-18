@@ -29,12 +29,6 @@ namespace Util
       return coordinate.X < 0 || coordinate.X > 7 || coordinate.Y < 0 || coordinate.Y > 7;
     }
 
-    public static void MovePhysically(PieceController pieceController, Coordinate destinationCoordinate)
-    {
-      pieceController.gameObject.transform.Translate(destinationCoordinate.Y - pieceController.Coordinate.Y, 0,
-        destinationCoordinate.X - pieceController.Coordinate.X);
-    }
-
     public static float CalculateAngle(float angle)
     {
       return Math.Abs(angle) > 180 ? 360 + angle : angle;

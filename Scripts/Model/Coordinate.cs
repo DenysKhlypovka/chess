@@ -17,6 +17,8 @@
             Y = coordinate.Y;
         }
 
+        public static Coordinate operator -(Coordinate a, Coordinate b) => new Coordinate(a.X - b.X, a.Y - b.Y);
+
         public bool Equals(Coordinate other)
         {
             return X == other.X && Y == other.Y;

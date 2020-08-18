@@ -47,9 +47,8 @@ namespace GameObjectScript
       return moved;
     }
 
-    public void Move(Coordinate coordinate)
+    public void MoveCoordinate(Coordinate coordinate)
     {
-      Util.Util.MovePhysically(this, coordinate);
       Coordinate = coordinate;
       moved = true;
     }

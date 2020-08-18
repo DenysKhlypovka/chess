@@ -39,6 +39,11 @@ namespace Util
             return Object.FindObjectOfType<ButtonsController>();
         }
 
+        public static PieceMoveController GetPieceMoveController()
+        {
+            return Object.FindObjectOfType<PieceMoveController>();
+        }
+
         public static Text GetLayoutText()
         {
             return GetGameObjectOfTag(Tag.layout).GetComponent<Text>();

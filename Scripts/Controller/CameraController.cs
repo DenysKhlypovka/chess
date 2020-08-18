@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Util;
+using Model;
 
 namespace Controller
 {
@@ -35,7 +36,6 @@ namespace Controller
     public void ToggleFixateCamera()
     {
       StopCoroutine(rotateCoroutine);
-      ToggleZoom(ZoomType.ZoomIn);
       StartCoroutine(ReturnToStaticPosition());
     }
 
@@ -70,11 +70,6 @@ namespace Controller
         transform.Translate(translateStep);
         yield return new WaitForEndOfFrame();
       }
-    }
-    
-    public enum ZoomType
-    {
-      ZoomIn, ZoomOut
     }
   }
 }

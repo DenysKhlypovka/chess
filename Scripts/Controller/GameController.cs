@@ -4,6 +4,7 @@ using GameObjectScript;
 using GameObjectScript.Piece;
 using Model;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Util;
 
 namespace Controller
@@ -16,6 +17,7 @@ namespace Controller
     private HighlightManager highlightManager;
     private PiecesController piecesController;
     private CapturePromotionController capturePromotionController;
+    private PieceMoveController pieceMoveController;
     private LayoutTextManager layoutTextManager;
 
     private Color turnColor = Color.white;
@@ -27,22 +29,49 @@ namespace Controller
       {Color.black, 7}
     };
 
+    private bool canBePaused;
+    
     void Start()
     {
       cameraController = ComponentsUtil.GetCameraController();
       boardController = ComponentsUtil.GetBoardController();
       buttonsController = ComponentsUtil.GetButtonsController();
+      pieceMoveController = ComponentsUtil.GetPieceMoveController();
       piecesController = new PiecesController(this);
       highlightManager = new HighlightManager(boardController);
+      capturePromotionController = new CapturePromotionController(pieceMoveController);
       layoutTextManager = new LayoutTextManager();
-      capturePromotionController = new CapturePromotionController();
-      
+
       ChangePiecesMeshColliderDependingOnTurn();
       SetPiecesAvailableMoves();
 
       buttonsController.Init();
-      buttonsController.StartGameButton.onClick.AddListener(delegate { FixateUnblurCamera(); });
-      buttonsController.ExitGameButton.onClick.AddListener(delegate { Application.Quit(); });
+      buttonsController.StartGameButton.onClick.AddListener(FixateUnblurCamera);
+      buttonsController.ExitGameButton.onClick.AddListener(Application.Quit);
+      
+      buttonsController.GoToMainMenuButton.onClick.AddListener(delegate { SceneManager.LoadScene("main"); });
+      buttonsController.PauseButton.onClick.AddListener(ShowPauseMenu);
+      buttonsController.ResumeButton.onClick.AddListener(delegate
+      {
+        buttonsController.ToggleFadePauseMenuButtons(FadeType.FadeOut);
+        ZoomBlur(ZoomType.ZoomIn);
+        buttonsController.EnableShowPauseButton();
+      });
+    }
+
+    void Update()
+    {
+      if (Input.GetKeyUp(KeyCode.Escape) && canBePaused)
+      {
+        ShowPauseMenu();
+      }
+    }
+
+    private void ShowPauseMenu()
+    {
+      buttonsController.DisableHidePauseButton();
+      buttonsController.ToggleFadePauseMenuButtons(FadeType.FadeIn);
+      ZoomBlur(ZoomType.ZoomOut);
     }
 
     public void ResetBoardAndPieces()
@@ -82,10 +111,11 @@ namespace Controller
 
     public void HighlightCells(List<MoveProperties> availableMoves, Coordinate coordinate)
     {
-      if (cameraController.zoomType == CameraController.ZoomType.ZoomOut)
+      if (cameraController.zoomType == ZoomType.ZoomOut)
       {
         FixateUnblurCamera();
       }
+
       highlightManager.HighlightCellUnderActivePiece(coordinate);
       availableMoves.ForEach(availableMove =>
         highlightManager.HighlightCell(availableMove.MoveType, availableMove.Coordinate));
@@ -99,21 +129,17 @@ namespace Controller
 
     public void TryPromotePiece(PieceController promotionPiece)
     {
-      if (promotionPiece.PieceType == Piece.Pawn || pieceToCaptureAfterPromotion == null || promotionPiece.Color != pieceToCaptureAfterPromotion.Color) return;
-      
-      promotionPiece.Move(pieceToCaptureAfterPromotion.Coordinate);
+      if (promotionPiece.PieceType == Piece.Pawn || pieceToCaptureAfterPromotion == null ||
+          promotionPiece.Color != pieceToCaptureAfterPromotion.Color) return;
+
+      pieceMoveController.Move(promotionPiece, pieceToCaptureAfterPromotion.Coordinate, false);
       capturePromotionController.RemoveFromCaptured(promotionPiece);
       promotionPiece.Captured = false;
-      
+
       CapturePiece(pieceToCaptureAfterPromotion);
       pieceToCaptureAfterPromotion = null;
       ChangeCellMeshCollider(true);
       NextTurn();
-    }
-
-    private void Move(PieceController piece, Coordinate coordinate)
-    {
-      piece.Move(coordinate);
     }
 
     public bool CanMoveOnto(Coordinate coordinate)
@@ -132,7 +158,7 @@ namespace Controller
     {
       if (pieceController.PieceType != Piece.Pawn ||
           pieceController.Coordinate.Y != promotionYByColor[pieceController.Color]) return false;
-      
+
       pieceToCaptureAfterPromotion = pieceController;
       return true;
     }
@@ -213,7 +239,7 @@ namespace Controller
         CapturePiece(optionalControllerOfPieceAtPosition);
       }
 
-      Move(activePiece, coordinate);
+      pieceMoveController.Move(activePiece, coordinate, true);
       if (!CheckPromotion(activePiece))
       {
         NextTurn();
@@ -233,9 +259,10 @@ namespace Controller
           CastlingUtil.GetRookCastlingDestinationX(optionalControllerOfRook) == destinationX &&
           IsCastlingAvailable(optionalControllerOfRook))
       {
-        Move(piecesController.GetKingOfColor(optionalControllerOfRook.Color),
+        pieceMoveController.Move(piecesController.GetKingOfColor(optionalControllerOfRook.Color), 
           new Coordinate(CastlingUtil.GetKingCastlingDestinationX(optionalControllerOfRook),
-            optionalControllerOfRook.Coordinate.Y));
+          optionalControllerOfRook.Coordinate.Y), 
+          true);
       }
     }
 
@@ -259,23 +286,37 @@ namespace Controller
     }
 
 
-
     private void FixateUnblurCamera()
     {
-      buttonsController.ToggleFadeOutButtons();
+      buttonsController.ToggleFadeOutMainMenuButtons();
+      ZoomBlur(ZoomType.ZoomIn);
       cameraController.ToggleFixateCamera();
-      PostProcessingController.DisablePostProcessLayer(cameraController.gameObject);
+      buttonsController.EnableShowPauseButton();
+    }
+
+    private void ZoomBlur(ZoomType zoomType)
+    {
+      if (zoomType == ZoomType.ZoomIn)
+      {
+        ZoomInUnblurCamera();
+      }
+      else
+      {
+        ZoomOutBlurCamera();
+      }
     }
 
     private void ZoomOutBlurCamera()
     {
-      cameraController.ToggleZoom(CameraController.ZoomType.ZoomOut);
+      canBePaused = false;
+      cameraController.ToggleZoom(ZoomType.ZoomOut);
       PostProcessingController.EnablePostProcessLayer(cameraController.gameObject);
     }
-    
+
     private void ZoomInUnblurCamera()
     {
-      cameraController.ToggleZoom(CameraController.ZoomType.ZoomIn);
+      canBePaused = true;
+      cameraController.ToggleZoom(ZoomType.ZoomIn);
       PostProcessingController.DisablePostProcessLayer(cameraController.gameObject);
     }
   }

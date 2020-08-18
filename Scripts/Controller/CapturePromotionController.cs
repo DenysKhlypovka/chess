@@ -11,10 +11,11 @@ namespace Controller
     private List<PieceController> CapturedPieces { get; }
     private readonly Dictionary<Color, int> capturedPosXByColor;
 
-    private PiecesController piecesController;
+    private PieceMoveController pieceMoveController;
 
-    public CapturePromotionController()
+    public CapturePromotionController(PieceMoveController pieceMoveController)
     {
+      this.pieceMoveController = pieceMoveController;
       CapturedPieces = new List<PieceController>();
       capturedPosXByColor = new Dictionary<Color, int>
       {
@@ -47,7 +48,8 @@ namespace Controller
             ? new Coordinate(posYPawns++, capturedPosXByColor[color])
             : new Coordinate(posY++, capturedPosXByColor[color] + offsetX);
 
-          piece.Move(rearrangeCoordinate);
+          pieceMoveController.Move(piece, rearrangeCoordinate, false);
+          piece.MoveCoordinate(rearrangeCoordinate);
         });
     }
   }
