@@ -9,10 +9,14 @@ namespace Controller
     {
         //TODO: refactor methods
         private readonly BoardController boardController;
+        private readonly PiecesController piecesController;
 
-        public HighlightManager(BoardController boardController)
+        private const float OUTLINE_WIDTH = 7.5f;
+
+        public HighlightManager(BoardController boardController, PiecesController piecesController)
         {
             this.boardController = boardController;
+            this.piecesController = piecesController;
         }
 
         public void HighlightCell(MoveType moveType, Coordinate coordinate)
@@ -27,7 +31,7 @@ namespace Controller
                     HighlightCellAvailableToMoveOnto(cellToChangeColor);
                     break;
                 case MoveType.Capture:
-                    HighlightCellUnderPieceToCapture(cellToChangeColor);
+                    OutlinePieceToCapture(coordinate);
                     break;
                 case MoveType.Unavailable:
                     return;
@@ -37,24 +41,57 @@ namespace Controller
             cellToChangeColor.GetComponent<CellController>().IsActivated = true;
         }
 
-        public void HighlightCellUnderActivePiece(Coordinate coordinate)
+        private void HighlightCastlingCell(CellController cellToChangeColor)
         {
-            RendererController.SetColorToYellow(boardController.GetCell(coordinate));
+            RendererController.SetColorToBlue(cellToChangeColor.gameObject, cellToChangeColor.Color == Color.black);
         }
 
-        private void HighlightCastlingCell(GameObject cellToChangeColor)
+        private void HighlightCellAvailableToMoveOnto(CellController cellToChangeColor)
         {
-            RendererController.SetColorToBlue(cellToChangeColor);
+            RendererController.SetColorToGreen(cellToChangeColor.gameObject, cellToChangeColor.Color == Color.black);
         }
 
-        private void HighlightCellAvailableToMoveOnto(GameObject cellToChangeColor)
+        public void InitOutlines()
         {
-            RendererController.SetColorToGreen(cellToChangeColor);
+            piecesController.Pieces.ForEach(piece => ChangeOutline(piece.GetComponent<Outline>(), Outline.Mode.OutlineHidden, Color.clear, OUTLINE_WIDTH));
         }
 
-        private void HighlightCellUnderPieceToCapture(GameObject cellToChangeColor)
+        public void RemoveAllOutlines()
         {
-            RendererController.SetColorToRed(cellToChangeColor);
+            piecesController.Pieces.ForEach(piece => ChangeOutline(piece.GetComponent<Outline>(), Outline.Mode.OutlineHidden, Color.clear));
+        }
+
+        public void OutlineActivePiece(Coordinate coordinate)
+        {
+            OutlineActivePiece(piecesController.GetPieceControllerAtPosition(coordinate));
+        }
+
+        public void OutlineActivePiece(PieceController piece)
+        {
+            ChangeOutline(GetOutlineOfPiece(piece), Outline.Mode.OutlineAll, Color.green);
+        }
+
+        private void OutlinePieceToCapture(Coordinate coordinate)
+        {
+            ChangeOutline(GetOutlineOfPiece(piecesController.GetPieceControllerAtPosition(coordinate)), Outline.Mode.OutlineAll, Color.red);
+        }
+
+        private Outline GetOutlineOfPiece(PieceController pieceController)
+        {
+            return pieceController.gameObject.GetComponent<Outline>();
+        }
+
+        private void ChangeOutline(Outline outline, Outline.Mode outlineMode, Color color)
+        {
+            outline.OutlineMode = outlineMode;
+            outline.OutlineColor = color;
+        }
+
+        private void ChangeOutline(Outline outline, Outline.Mode outlineMode, Color color, float width)
+        {
+            outline.OutlineMode = outlineMode;
+            outline.OutlineColor = color;
+            outline.OutlineWidth = width;
         }
     }
 }

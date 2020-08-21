@@ -20,9 +20,9 @@ namespace Controller
             }
         }
 
-        public GameObject GetCell(Coordinate coordinate)
+        public CellController GetCell(Coordinate coordinate)
         {
-            return CellControllers.First(cell => cell.Coordinate.Equals(coordinate)).gameObject;
+            return CellControllers.First(cell => cell.Coordinate.Equals(coordinate));
         }
 
         public void RedrawCells()

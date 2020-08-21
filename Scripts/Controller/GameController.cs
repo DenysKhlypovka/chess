@@ -38,12 +38,13 @@ namespace Controller
       buttonsController = ComponentsUtil.GetButtonsController();
       pieceMoveController = ComponentsUtil.GetPieceMoveController();
       piecesController = new PiecesController(this);
-      highlightManager = new HighlightManager(boardController);
+      highlightManager = new HighlightManager(boardController, piecesController);
       capturePromotionController = new CapturePromotionController(pieceMoveController);
       layoutTextManager = new LayoutTextManager();
 
       ChangePiecesMeshColliderDependingOnTurn();
       SetPiecesAvailableMoves();
+      highlightManager.InitOutlines();
 
       buttonsController.Init();
       buttonsController.StartGameButton.onClick.AddListener(FixateUnblurCamera);
@@ -76,6 +77,7 @@ namespace Controller
 
     public void ResetBoardAndPieces()
     {
+      highlightManager.RemoveAllOutlines();
       piecesController.DeactivatePieces();
       boardController.RedrawCells();
     }
@@ -90,6 +92,12 @@ namespace Controller
       piecesController.Pieces.ForEach(pieceController =>
         ColliderController.ChangeMeshColliderEnabledProperty(pieceController.gameObject,
           turnColor == pieceController.Color));
+    }
+
+    private void OutlineCapturedPieces()
+    {
+      piecesController.Pieces.Where(piece => piece.Captured && piece.Color == turnColor && piece.PieceType != Piece.Pawn).ToList().ForEach(pieceController =>
+        highlightManager.OutlineActivePiece(pieceController));
     }
 
     private void DisableMeshColliderOfPiecesInPlay()
@@ -116,7 +124,7 @@ namespace Controller
         FixateUnblurCamera();
       }
 
-      highlightManager.HighlightCellUnderActivePiece(coordinate);
+      highlightManager.OutlineActivePiece(coordinate);
       availableMoves.ForEach(availableMove =>
         highlightManager.HighlightCell(availableMove.MoveType, availableMove.Coordinate));
     }
@@ -157,7 +165,8 @@ namespace Controller
     private bool CheckPromotion(PieceController pieceController)
     {
       if (pieceController.PieceType != Piece.Pawn ||
-          pieceController.Coordinate.Y != promotionYByColor[pieceController.Color]) return false;
+          pieceController.Coordinate.Y != promotionYByColor[pieceController.Color] || 
+          !piecesController.Pieces.Any(piece => piece.Captured && piece.Color == turnColor)) return false;
 
       pieceToCaptureAfterPromotion = pieceController;
       return true;
@@ -248,6 +257,7 @@ namespace Controller
       {
         ResetBoardAndPieces();
         DisableMeshColliderOfPiecesInPlay();
+        OutlineCapturedPieces();
         ChangeCellMeshCollider(false);
       }
     }

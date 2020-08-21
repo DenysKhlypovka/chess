@@ -33,7 +33,6 @@ namespace Controller
 
       DisableHidePauseButton();
       ButtonsChangeEnabled(pauseMenuButtons, false);
-      ButtonsChangeTextEnabled(pauseMenuButtons, false);
       pauseMenuButtons.ForEach(button =>
       {
         var buttonImage = button.GetComponent<Image>();
@@ -65,15 +64,7 @@ namespace Controller
         button.enabled = isEnabled;
       });
     }
-
-    private void ButtonsChangeTextEnabled(List<Button> buttons, bool isEnabled)
-    {
-      buttons.ForEach(button =>
-      {
-        button.transform.GetComponentInChildren<Text>().enabled = isEnabled;
-      });
-    }
-
+    
     public void ToggleFadeOutMainMenuButtons()
     {
       StartCoroutine(Fade(mainMenuButtons, FadeType.FadeOut));
@@ -101,7 +92,6 @@ namespace Controller
         });
         yield return new WaitForEndOfFrame();
       }
-      ButtonsChangeTextEnabled(buttons, isFadeIn);
     }
   }
 }
