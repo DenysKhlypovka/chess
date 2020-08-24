@@ -18,7 +18,7 @@ namespace Controller
     private PiecesController piecesController;
     private CapturePromotionController capturePromotionController;
     private PieceMoveController pieceMoveController;
-    private LayoutTextManager layoutTextManager;
+    private LayoutManager layoutManager;
 
     private Color turnColor = Color.white;
     private PieceController pieceToCaptureAfterPromotion;
@@ -40,7 +40,7 @@ namespace Controller
       piecesController = new PiecesController(this);
       highlightManager = new HighlightManager(boardController, piecesController);
       capturePromotionController = new CapturePromotionController(pieceMoveController);
-      layoutTextManager = new LayoutTextManager();
+      layoutManager = new LayoutManager();
 
       ChangePiecesMeshColliderDependingOnTurn();
       SetPiecesAvailableMoves();
@@ -181,15 +181,15 @@ namespace Controller
       if (piecesController.GetPieceControllersOfColor(turnColor)
         .All(pieceController => pieceController.NoAvailableMoves()))
       {
-        layoutTextManager.DisplayCheckMateText(turnColor);
+        layoutManager.DisplayCheckMate(turnColor);
       }
       else if (VerifyCheck())
       {
-        layoutTextManager.DisplayCheckText(turnColor);
+        layoutManager.DisplayCheck(turnColor);
       }
       else
       {
-        layoutTextManager.DisplayNothing();
+        layoutManager.DisplayNothing();
       }
     }
 
